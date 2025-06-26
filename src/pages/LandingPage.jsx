@@ -1,23 +1,33 @@
-import React, { useState } from 'react'
-import Header from '../component/Header'
-import { Link } from 'react-router-dom'
-import '../App.css'
-import Footer from '../component/Footer'
-
+import React from 'react';
+import '../App.css';
+import '../component/CSS/LandingPage.css';
 
 const LandingPage = () => {
+  const handleGuest = () => {
+    window.location.href = "/guest-home";
+  };
+
   return (
-    <div >
-      <div className='landing' >
-        <h1>Welcome to Unilag Yard</h1>
-        <p>Please choose <span className='highlight'>Guest Mode</span> to explore or <span className='highlight'>Login/Signup</span> to access your account.</p>
-        <div className='landing-btns-flex'>
-          <Link to="/home" className='landing-btns'>Guest Mode</Link>
-          <Link to="/login" className='landing-btns'>Login/Signup</Link>
+    <div className="landing-container">
+      <div className="landing-content">
+        <h1 className="welcome-text">
+          Welcome to <span className="campus-name">UNILAG Yard</span>
+          <div className="underline-animation"></div>
+        </h1>
+        <p className="subtitle">
+          Nigeria's premier student marketplace. Buy, sell, and connect with campus ease.
+        </p>
+        <div className="cta-buttons">
+          <button className="cta-button guest-mode" onClick={handleGuest}>
+            Browse as Guest
+          </button>
+          <a href="/login" className="cta-button login-signup">
+            Login / Sign Up
+          </a>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

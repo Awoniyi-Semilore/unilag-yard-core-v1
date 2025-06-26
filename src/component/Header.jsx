@@ -1,332 +1,112 @@
-    import React, { useState, useContext, useEffect } from 'react';
-    import { FiPlus, FiUser, FiSearch } from 'react-icons/fi';
-    import { FaCaretDown } from 'react-icons/fa';
-    import { Link } from 'react-router-dom';
-    import { AuthContext } from '../pages/AuthContext';
-    import { doc, setDoc, getDoc, deleteDoc, } from 'firebase/firestore';
-    import { deleteUser } from 'firebase/auth';
-    import { auth, db } from '../pages/firebase';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "./CSS/Header.css";
+import profileIcon from "../media/download.png";
+import { CgProfile } from "react-icons/cg";
 
+const Header = ({ user = null, logout = () => {} }) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const Header = () => {
-      const { user, logout } = useContext(AuthContext);
-      const [showDropped, setShowDropped] = useState(false);
-      const [showProfile, setShowProfile] = useState(false);
-      const [showSettings, setShowSettings] = useState(false);
-      const [settings, setSettings] = useState({
-        notifications: 'enabled',
-        emailUpdates: 'subscribed',
-      });
+  // Debugging - log the user object
+  console.log("Header user object:", user);
 
-      const dropDown = () => {
-      };
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
-      const toggleProfile = () => {
-        setShowProfile((prev) => !prev);
-        setShowSettings(false);
-      };
+  // Robust name extraction
+  const getUserName = () => {
+    if (!user) {
+      console.warn("No user object available");
+      return "User";
+    }
 
-      const toggleSettings = () => {
-        setShowSettings((prev) => !prev);
-        setShowProfile(false);
-      };
+    // Check all possible name sources
+    const nameSource = user.displayName || user.name || user.email;
+    
+    if (!nameSource) {
+      console.warn("User object exists but no name fields found:", user);
+      return "User";
+    }
 
-      const handleLogout = () => {
-        logout();
-        setShowDropped(false);
-      };
+    // Handle email case
+    if (nameSource.includes("@")) {
+      return nameSource.split("@")[0];
+    }
 
-      const handleDeleteAccount = async () => {
-        const confirmation = window.confirm("This action cannot be undone. Press OK to delete your account or Cancel to go back.");
-        if (!confirmation) return;
+    // Return first name if available
+    return nameSource.split(" ")[0] || nameSource;
+  };
 
-        try {
-          const userAuth = auth.currentUser;
-          await deleteDoc(doc(db, "users", userAuth.uid)); // Delete Firestore user data
-          await deleteUser(userAuth);                      // Delete Auth account
-          logout();                                        // Clear local session
-          alert("Your account has been deleted.");
-        } catch (err) {
-          console.error("Account deletion error:", err);
-          alert("Failed to delete account. Try logging in again.");
-        }
-      };
+  return (
+    <header className="header-div">
+      <Link className="logo" to="/home">UNILAG Yard</Link>
 
+      <div className="burger" onClick={toggleMobileMenu}>
+        &#9776;
+      </div>
 
-      const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setSettings((prev) => ({ ...prev, [name]: value }));
-      };
+      <div className="logo-right">
+        <div className="logo-btn-flex">
+          <img
+            src={CgProfile} alt="profile" className="google-img"
+            style={{ borderRadius: "50%", width: "40px", height: "40px" }}
+          />
+          <Link to="/addProduct" className="logo-btn">AddProduct</Link>
+        </div>
+        <Link to="/allProduct" className="logo-btn-flex logo-btn">AllProduct</Link>
+        {user ? (
+          <div className="logo-btn-flex" onClick={toggleDropdown}>
+            <img
+              src={user?.photoURL || profileIcon}
+              alt="profile"
+              className="google-img"
+              style={{ borderRadius: "50%", width: "40px", height: "40px" }}
+            />
+            <span className="logo-btn">Hi, {getUserName()}</span>
+            {dropdownOpen && (
+              <div className="dropdown-menu">
+                <h6>Profile</h6>
+                <h6>Settings</h6>
+                <h6 onClick={logout}>Logout</h6>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <Link className="logo-btn-flex" to="/login">
+              <span className="logo-btn">Login</span>
+            </Link>
+            <Link className="logo-btn-flex1" to="/signup">
+              <span className="logo-btn">Sign Up</span>
+            </Link>
+          </>
+        )}
+      </div>
 
-      const handleSettingsSave = async (e) => {
-        e.preventDefault();
-        try {
-          await setDoc(doc(db, 'userSettings', user.uid), settings);
-          alert('Settings saved.');
-        } catch (err) {
-          console.error('Error saving settings:', err);
-        }
-      };
-
-      useEffect(() => {
-        const fetchSettings = async () => {
-          if (user) {
-            const docRef = doc(db, 'userSettings', user.uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              setSettings(docSnap.data());
-            }
-          }
-        };
-        fetchSettings();
-      }, [user]);
-
-      return (
-        <div>
+      {mobileMenuOpen && (
+        <div className="dropdown-menu2" onMouseLeave={toggleMobileMenu}>
           {user ? (
-            <div className='header-div'>
-              <div>
-                <Link to="/home" className='logo'>Unilag Yard</Link>
-              </div>
-              <div className='logo-right'>
-                <Link to="/allProduct" className='logo-btn-flex'>
-                  <FiSearch size={24} color="white" />
-                  <h5 className='logo-btn'>Search</h5>
-                </Link>
-                <Link to="/addProduct" className='logo-btn-flex'>
-                  <FiPlus size={24} color="white" />
-                  <h5 className='logo-btn'>Add Product</h5>
-                </Link>
-
-                <div
-                  className='logo-btn-flex'
-                  onClick={dropDown}
-                  onMouseEnter={() => setShowDropped(true)}
-                  onMouseLeave={() => setShowDropped(false)}
-                >
-                  {user.photoURL && (
-                    <img src={user.photoURL} alt="Profile" className="profile-img" />
-                  )}
-                  <h5 className='logo-btn'>Welcome, {user.username || user.displayName || 'User'}</h5>
-                  <FaCaretDown size={12} color="white" />
-                  {showDropped && (
-                    <div className="dropdown-menu">
-                      <h6 onClick={toggleProfile}  style={{ cursor: 'pointer' }}>My Account</h6>
-                      {showProfile && (
-                        <div className="dropdown-sub">
-                          <p>Username: {user.username || user.displayName || currentUser.displayName }</p>
-                          <p>Email: {user.email}</p>
-                          {user.photoURL && <img src={user.photoURL} alt="Profile" className="profile-img" />}
-                        </div>
-                      )}
-                      <h6 onClick={toggleSettings}  style={{ cursor: 'pointer' }}>Settings</h6>
-                      {showSettings && (
-                        <form className="dropdown-sub" onSubmit={handleSettingsSave}>
-                          <p><strong>Notifications:</strong></p>
-                          <div className='radios'>
-                            <label>
-                              <input
-                                type="radio"
-                                name="notifications"
-                                value="enabled"
-                                checked={settings.notifications === 'enabled'}
-                                onChange={handleInputChange}
-                              />
-                              Enable
-                            </label>
-                            <label>
-                              <input
-                                type="radio"
-                                name="notifications"
-                                value="disabled"
-                                checked={settings.notifications === 'disabled'}
-                                onChange={handleInputChange}
-                              />
-                              Disable
-                            </label>
-
-                          </div>
-                          <p><strong>Email Updates:</strong></p>
-                          <div className='radios'>
-                            <label>
-                              <input
-                                type="radio"
-                                name="emailUpdates"
-                                value="subscribed"
-                                checked={settings.emailUpdates === 'subscribed'}
-                                onChange={handleInputChange}
-                              />
-                              Subscribe
-                            </label>
-                            <label>
-                              <input
-                                type="radio"
-                                name="emailUpdates"
-                                value="unsubscribed"
-                                checked={settings.emailUpdates === 'unsubscribed'}
-                                onChange={handleInputChange}
-                              />
-                              Unsubscribe
-                            </label>
-                            <button type="submit" className='save'>Save Settings</button>
-                          </div>
-                        </form>
-                      )}
-                      <h6 onClick={handleDeleteAccount} style={{ cursor: 'pointer', color: 'red' }}>Delete Account</h6>
-                      <h6 onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</h6>
-                    </div>
-                  )}
-                </div>
-                
-                
-              </div>
-
-              <div
-                className='burger'
-                onClick={dropDown}
-                onMouseEnter={() => setShowDropped(true)}
-                onMouseLeave={() => setShowDropped(false)}
-              >
-                <FaCaretDown size={120} color="#4caf50" />
-                {showDropped && (
-                  <div className="dropdown-menu1">
-
-                    <div className='logo-right1'>
-                      <Link to="/allProduct" className='logo-btn-flex1'>
-                        <FiSearch size={24} color="white" />
-                        <h5 className='logo-btn'>Search</h5>
-                      </Link>
-                      <Link to="/addProduct" className='logo-btn-flex1'>
-                        <FiPlus size={24} color="white" />
-                        <h5 className='logo-btn'>Add Product</h5>
-                      </Link>
-
-                      <div
-                        className='logo-btn-flex1'
-                        onClick={dropDown}
-                        onMouseEnter={() => setShowDropped(true)}
-                        onMouseLeave={() => setShowDropped(false)}
-                      >
-                        {user.photoURL && (
-                          <img src={user.photoURL} alt="Profile" className="profile-img" />
-                        )}
-                        <h5 className='logo-btn'>Welcome, {user.username || user.displayName || 'User'}</h5>
-                        <FaCaretDown size={12} color="white" />
-                        {showDropped && (
-                          <div className="dropdown-menu2">
-                            <h6 onClick={toggleProfile}  style={{ cursor: 'pointer' }}>My Account</h6>
-                            {showProfile && (
-                              <div className="dropdown-sub">
-                                <p>Username: {user.username || user.displayName || currentUser.displayName }</p>
-                                <p>Email: {user.email}</p>
-                                {user.photoURL && <img src={user.photoURL} alt="Profile" className="profile-img" />}
-                              </div>
-                            )}
-                            <h6 onClick={toggleSettings}  style={{ cursor: 'pointer' }}>Settings</h6>
-                            {showSettings && (
-                              <form className="dropdown-sub" onSubmit={handleSettingsSave}>
-                                <p><strong>Notifications:</strong></p>
-                                <div className='radios'>
-                                  <label>
-                                    <input
-                                      type="radio"
-                                      name="notifications"
-                                      value="enabled"
-                                      checked={settings.notifications === 'enabled'}
-                                      onChange={handleInputChange}
-                                    />
-                                    Enable
-                                  </label>
-                                  <label>
-                                    <input
-                                      type="radio"
-                                      name="notifications"
-                                      value="disabled"
-                                      checked={settings.notifications === 'disabled'}
-                                      onChange={handleInputChange}
-                                    />
-                                    Disable
-                                  </label>
-
-                                </div>
-                                <p><strong>Email Updates:</strong></p>
-                                <div className='radios'>
-                                  <label>
-                                    <input
-                                      type="radio"
-                                      name="emailUpdates"
-                                      value="subscribed"
-                                      checked={settings.emailUpdates === 'subscribed'}
-                                      onChange={handleInputChange}
-                                    />
-                                    Subscribe
-                                  </label>
-                                  <label>
-                                    <input
-                                      type="radio"
-                                      name="emailUpdates"
-                                      value="unsubscribed"
-                                      checked={settings.emailUpdates === 'unsubscribed'}
-                                      onChange={handleInputChange}
-                                    />
-                                    Unsubscribe
-                                  </label>
-                                  <button type="submit" className='save'>Save Settings</button>
-                                </div>
-                              </form>
-                            )}
-                            <h6 onClick={handleDeleteAccount} style={{ cursor: 'pointer', color: 'red' }}>Delete Account</h6>
-                            <h6 onClick={handleLogout} style={{ cursor: 'pointer' }}>Logout</h6>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  
-                  </div>
-
-                )}
-              </div>
-
-            </div>
+            <>
+              <h6>Profile</h6>
+              <h6>Settings</h6>
+              <h6 onClick={() => { logout(); setMobileMenuOpen(false); }}>Logout</h6>
+            </>
           ) : (
-            <div className='header-div'>
-              <div>
-                <Link to="/home" className='logo'>Unilag Yard</Link>
-              </div>
-              <div className='logo-right'>
-                <Link to="/allProduct" className='logo-btn-flex'>
-                  <FiSearch size={24} color="white" />
-                  <h5 className='logo-btn'>Search</h5>
-                </Link>
-                <Link to="/login" className='logo-btn-flex'>
-                  <h5 className='logo-btn'>Login/Signup</h5>
-                </Link>
-              </div>
-              <div
-                className='burger'
-                onClick={dropDown}
-                onMouseEnter={() => setShowDropped(true)}
-                onMouseLeave={() => setShowDropped(false)}
-              >
-                <FaCaretDown size={80} color="#4caf50" />
-                {showDropped && (
-                  <div className="dropdown-menu">
-                    <div className='logo-right1'>
-                      <Link to="/allProduct" className='logo-btn-flex'>
-                        <FiSearch size={24} color="white" />
-                        <h5 className='logo-btn'>Search</h5>
-                      </Link>
-                      <Link to="/login" className='logo-btn-flex'>
-                        <h5 className='logo-btn'>Login/Signup</h5>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <>
+              <h6><Link to="/login" onClick={() => setMobileMenuOpen(false)}>Login</Link></h6>
+              <h6><Link to="/signup" onClick={() => setMobileMenuOpen(false)}>Sign Up</Link></h6>
+            </>
           )}
         </div>
-      );
-    };
+      )}
+    </header>
+  );
+};
 
-    export default Header;
+Header.defaultProps = {
+  user: null,
+  logout: () => {}
+};
+
+export default Header;

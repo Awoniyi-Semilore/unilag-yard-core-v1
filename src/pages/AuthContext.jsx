@@ -1,45 +1,89 @@
-// src/AuthContext.jsx
 import React, { createContext, useState, useEffect } from "react";
 import { auth } from "./firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        const userData = {
-          username: currentUser.displayName || currentUser.email?.split("@")[0] || "User",
-          email: currentUser.email,
-          photoURL: currentUser.photoURL || null,
-        };
-        setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          name: firebaseUser.displayName || firebaseUser.email,
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL,
+          uid: firebaseUser.uid,
+        });
       } else {
         setUser(null);
-        localStorage.removeItem("user");
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
+  const login = async (email, password) => {
+    const res = await signInWithEmailAndPassword(auth, email, password);
+    setUser({
+      name: res.user.displayName || res.user.email,
+      email: res.user.email,
+      photoURL: res.user.photoURL,
+      uid: res.user.uid,
+    });
+  };
+
+  const signup = async (email, password) => {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    setUser({
+      name: res.user.displayName || res.user.email,
+      email: res.user.email,
+      photoURL: res.user.photoURL,
+      uid: res.user.uid,
+    });
+  };
+
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    const res = await signInWithPopup(auth, provider);
+    setUser({
+      name: res.user.displayName,
+      email: res.user.email,
+      photoURL: res.user.photoURL,
+      uid: res.user.uid,
+    });
+  };
+
   const logout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      localStorage.removeItem("user");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    await signOut(auth);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
+    <AuthContext.Provider
+      value={{
+        isLoggedIn: !!user,
+        user,
+        login,
+        signup,
+        logout,
+        loginWithGoogle,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

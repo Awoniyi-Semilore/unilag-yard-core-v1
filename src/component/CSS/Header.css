@@ -1,0 +1,180 @@
+/* Base Styles */
+.header-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* Navigation Elements */
+.logo-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo-btn-flex,
+.logo-btn-flex1 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.logo-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Logged-in User Specific */
+.google-img {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 2px solid #f0f0f0;
+  transition: transform 0.3s ease;
+}
+
+.logo-btn-flex:hover .google-img {
+  transform: scale(1.05);
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  min-width: 180px;
+  opacity: 0;
+  transform: translateY(-10px);
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.dropdown-menu h6 {
+  padding: 0.75rem 1.5rem;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+
+
+.dropdown-menu h6:hover {
+  background: #f8f8f8;
+}
+
+.logo-btn-flex:hover .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+/* Mobile Menu */
+.burger {
+  display: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.dropdown-menu2 {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  z-index: 99;
+}
+
+.dropdown-menu2 h6 {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* Product Links */
+.nav-product-link {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.nav-product-link:hover {
+  background: #f5f5f5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-div {
+    padding: 1rem;
+  }
+
+  .burger {
+    display: block;
+  }
+
+  .logo-right > .logo-btn-flex:not(:last-child),
+  .logo-right > .logo-btn-flex1 {
+    display: none;
+  }
+
+  .dropdown-menu2 {
+    display: flex;
+  }
+
+  .dropdown-menu {
+    right: 1rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .dropdown-menu2 {
+    display: none !important;
+  }
+}
+
+/* Animation Enhancements */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-menu {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Button States */
+.logo-btn-flex:hover,
+.logo-btn-flex1:hover {
+  transform: translateY(-2px);
+}
+
+.logo-btn-flex:active,
+.logo-btn-flex1:active {
+  transform: translateY(0);
+}

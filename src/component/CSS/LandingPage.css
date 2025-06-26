@@ -1,0 +1,303 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== LANDING PAGE ===== */
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
+    url('https://images.unsplash.com/photo-1541178735493-479c1a27ed24?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80&crop=entropy') center/cover no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+body.loaded .landing-container {
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)),
+    url('/images/unilag-bg.webp');
+}
+
+.landing-container::before {
+  content: "";
+  position: absolute;
+  background: #f8f9fa;
+  inset: 0;
+  z-index: -2;
+}
+
+.landing-content {
+  background: rgba(255, 255, 255, 0.96);
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  max-width: 800px;
+  width: 90%;
+  margin: 0 auto;
+  animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Typography */
+.welcome-text {
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  color: #1a2e35;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.campus-name {
+  color: #2e7d32;
+  background: linear-gradient(90deg, #2e7d32, #388e3c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+}
+
+.underline-animation {
+  height: 4px;
+  width: 100px;
+  background: linear-gradient(90deg, #2e7d32, #388e3c);
+  margin: 1rem auto;
+  border-radius: 2px;
+  animation: underlineGrow 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.subtitle {
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  color: #4a5c66;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+  text-align: center;
+  max-width: 600px;
+}
+
+.highlight {
+  font-weight: 600;
+  color: #2e7d32;
+  position: relative;
+}
+
+.highlight::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #388e3c;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.highlight:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Buttons */
+.cta-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.cta-button {
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  min-width: 180px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.cta-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.6s cubic-bezier(0.83, 0, 0.17, 1);
+}
+
+.cta-button:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.guest-mode {
+  background: white;
+  color: #2e7d32;
+  border: 2px solid #2e7d32;
+  box-shadow: 0 4px 6px rgba(46, 125, 50, 0.1);
+}
+
+.guest-mode:hover {
+  color: white;
+  background: #2e7d32;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 15px rgba(46, 125, 50, 0.2);
+}
+
+.login-signup {
+  background: linear-gradient(135deg, #2e7d32, #388e3c);
+  color: white;
+  box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);
+}
+
+.login-signup:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 15px rgba(46, 125, 50, 0.3);
+  background: linear-gradient(135deg, #388e3c, #2e7d32);
+}
+
+/* Animation */
+.floating-illustration {
+  margin: 2.5rem auto 0;
+  animation: float 4s ease-in-out infinite;
+  width: 100px;
+  height: auto;
+  filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.1));
+  opacity: 0.9;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes underlineGrow {
+  from { width: 0; opacity: 0; }
+  to { width: 100px; opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .landing-container {
+    padding: 1.5rem;
+    background-position: 65% center;
+  }
+  
+  .landing-content {
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .cta-buttons {
+    gap: 1rem;
+  }
+  
+  .cta-button {
+    min-width: 160px;
+    padding: 0.9rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-content {
+    width: 100%;
+    padding: 1.8rem 1.2rem;
+  }
+  
+  .welcome-text {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .cta-button {
+    width: 100%;
+  }
+  
+  .floating-illustration {
+    width: 80px;
+  }
+}
+
+/* App.css */
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.94)),
+    url('https://images.unsplash.com/photo-1541178735493-479c1a27ed24?ixlib=rb-4.0.3&auto=format&crop=entropy') center/cover no-repeat;
+}
+
+.landing-content {
+  background: rgba(255, 255, 255, 0.96);
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
+  max-width: 800px;
+  width: 90%;
+  margin: 0 auto;
+  animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.welcome-text {
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  color: #1a2e35;
+  text-align: center;
+}
+
+.campus-name {
+  color: #2e7d32;
+  background: linear-gradient(90deg, #2e7d32, #388e3c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.underline-animation {
+  height: 4px;
+  width: 100px;
+  background: linear-gradient(90deg, #2e7d32, #388e3c);
+  margin: 1rem auto;
+  border-radius: 2px;
+  animation: underlineGrow 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Keep other existing styles from previous CSS */
+

@@ -1,14 +1,15 @@
 // src/pages/Login.jsx
 import React, { useState, useContext } from 'react';
+import '../Login/Login.css'
 import { useNavigate, Link } from 'react-router-dom';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { auth } from './firebase';
-import { AuthContext } from './AuthContext';
-import ForgottenPassword from './ForgottenPassword';
+import { auth } from '../firebase';
+import { AuthContext } from '../AuthContext';
+import ForgottenPassword from '../ForgottenPassword';
 
 function Login() {
   const [email, setEmail] = useState('');
