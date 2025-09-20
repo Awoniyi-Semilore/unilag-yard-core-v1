@@ -48,7 +48,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start; /* Align to top for better vertical alignment */
-  gap: 40px; /* Increased gap */
+  gap: 20px; /* Increased gap */
   padding: 60px 40px; /* Increased padding */
   flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
@@ -57,6 +57,7 @@
 .footer1, .footer2 {
   flex: 1;
   min-width: 200px; /* Prevent columns from getting too narrow */
+  max-width: 300px;
 }
 
 .footer1 h4 {
@@ -134,20 +135,8 @@
   border-top: 1px solid #dfe3e8; /* Add subtle top border */
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .footer-top {
-    flex-direction: column;
-    gap: 30px;
-    padding: 40px 20px;
-  }
-  
-  .footer2 {
-    align-items: center; /* Center align on mobile */
-    text-align: center;
-  }
-  
-  .social-icons {
-    gap: 1rem;
+@media (max-width: 315px){
+  .social-icons{
+    gap: 0;
   }
 }

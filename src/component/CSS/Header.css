@@ -64,33 +64,80 @@
   gap: 20px;
 }
 
+.nav-iconss{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
 .heart-icon {
   color: red;       /* This changes the outline color to red */
   fill: red !important;         /* This fills the inside of the heart */
   cursor: pointer;
 }
 
+.heart-icon:hover{
+  border: 2px solid #388e3c;
+}
+
+.message-icon:hover{
+  border: 2px solid #388e3c;
+}
+
+.profile-icon:hover{
+  border: 2px solid #388e3c;
+}
+
+.advert-icon:hover{
+  border: 2px solid #388e3c;
+}
+
+.bell-icon:hover{
+  border: 2px solid #388e3c;
+}
+
 .message-icon {
   color: #4e5d6c; /* Outline */
   fill: #ffffff;   /* Inside */
+    cursor: pointer;
 }
 
 .advert-icon {
   color: #8B4513; /* Brown Outline */
   fill: #00000023;   /* Black for the inner lines */
+    cursor: pointer;
 }
 
 .bell-icon {
   color: #4e5d6c; /* Grey Outline */
   fill: #FFD700;   /* Yellow Fill */
+    cursor: pointer;
 }
 
 .profile-icon {
   color: #4e5d6c; /* Dark Grey Outline */
   fill: #dfe3e8 ;   /* Dark Grey Fill (makes it solid) */
+    cursor: pointer;
 }
 
-.product-btn{
+.product-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: #2e7d32;
+  color: #ffffff;
+  padding: 5px;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.product-btn1 {
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -112,7 +159,17 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow on hover */
 }
 
+.product-btn1:hover {
+  background-color: #388e3c; /* Lighter green on hover */
+  transform: translateY(-1px); /* Slight lift effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow on hover */
+}
+
 .product-btn:hover .icon-hover {
+  color: #ffffff !important;
+}
+
+.product-btn1:hover .icon-hover {
   color: #ffffff !important;
 }
 
@@ -142,4 +199,204 @@
 .sign-btn:active {
   transform: translateY(0); /* Remove lift when clicked */
   box-shadow: 0 2px 4px rgba(46, 125, 50, 0.2); /* Smaller shadow when clicked */
+}
+
+
+@media (max-width: 830px){
+  .burger-icon{
+    display: contents;
+    font-size: 30px;
+  }
+  .search-bar{
+    display: none;
+  }
+  .sign-btn{
+    display: none;
+  }
+}
+@media (max-width: 360px){
+  .logo{
+    font-size: 20px;
+  }
+}
+
+/* Burger Menu Styles */
+.burger-menu {
+  display: none; /* Hidden by default on desktop */
+  position: relative;
+  cursor: pointer;
+}
+
+.burger-icon {
+  font-size: 30px;
+  color: #4e5d6c;
+  padding: 0.5rem;
+}
+
+/* Burger Dropdown */
+.burger-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 1rem;
+  min-width: 250px;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.dropdown-search {
+  margin-bottom: 1rem;
+}
+
+.dropdown-search .search-bar {
+  max-width: 100%;
+}
+
+.dropdown-search input {
+  font-size: 14px;
+  padding: 0.5rem 2rem 0.5rem 0.8rem;
+}
+
+.dropdown-sign-btn {
+  display: block;
+  text-align: center;
+  padding: 0.6rem;
+  border: 2px solid #2e7d32;
+  border-radius: 5px;
+  color: #2e7d32;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dropdown-sign-btn:hover {
+  background-color: #2e7d32;
+  color: white;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Show burger only on mobile */
+@media (max-width: 830px) {
+  .burger-menu {
+    display: block;
+  }
+  
+  .search-section,
+  .auth-section {
+    display: none; /* Hide regular search and auth on mobile */
+  }
+}
+
+/* Style for dropdown search bar specifically */
+.dropdown-search-bar {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 100%; /* Full width in dropdown */
+}
+
+.dropdown-search-bar input {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.8rem;
+  border: 1px solid #dfe3e8;
+  border-radius: 50px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #565D6D;
+  box-sizing: border-box;
+}
+
+/* Container for each icon + label */
+.icon-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Label styling */
+.icon-label {
+  position: absolute;
+  top: 100%;
+  margin-top: 5px;
+  background: #2e7d32; /* Your green color */
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Small arrow pointing to the icon */
+.icon-label::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #2e7d32;
+}
+
+/* Animation for smooth appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure nav-icons container can handle the labels */
+.nav-icons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.nav-iconss {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+@media (max-width: 1015px){
+  .search-bar{
+    display: none;
+  }
+  .nav-icons{
+    display: none;
+  }
+}
+
+@media (max-width: 430px){
+  .nav-iconss{
+    display: flex
+  }
 }
