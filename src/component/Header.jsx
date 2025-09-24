@@ -5,6 +5,16 @@ import { Heart, MessageCircle, ClipboardList, Bell, User, Search, PlusCircle } f
 
 const Header = ({ user = null, logout = () => {} }) => {
   const [isHovered, setIsHovered] = useState(null);
+  const [activeIcon, setActiveIcon] = useState(null); // ← Add this
+
+  const handleIconClick = (index) => {
+    // If clicking the same icon again, close it
+    if (activeIcon === index) {
+      setActiveIcon(null);
+    } else {
+      setActiveIcon(index); // Otherwise, open this icon
+    }
+  };
 
  const iconData = [
     { icon: Heart, label: "Saved Items", id: "saved" , className: "heart-icon"},
@@ -28,6 +38,10 @@ const Header = ({ user = null, logout = () => {} }) => {
   };
 
   const handleMouseLeave = () => {
+    setIsDropdownOpen(false);
+  };
+
+  const handleCloseDropdown = () => {
     setIsDropdownOpen(false);
   };
 
@@ -63,9 +77,10 @@ const Header = ({ user = null, logout = () => {} }) => {
                   className={`icon-hover ${item.className}`}
                   onMouseEnter={() => handleHovered(index)}
                   onMouseLeave={handleNotHovered}
+                  onClick={() => handleIconClick(index)}
                 />
-                {/* Show label only for the hovered icon */}
-                {isHovered === index && (
+                {/* Show label for hovered OR clicked icon */}
+                {(isHovered === index || activeIcon === index) && (
                   <div className="icon-label">
                     {item.label}
                   </div>
@@ -84,8 +99,9 @@ const Header = ({ user = null, logout = () => {} }) => {
 
           {/* Burger Menu */}
         <div 
-          className="burger-menu" 
+          className="burger-menu1" 
           onMouseEnter={handleMouseEnter}
+          onClick={(e) => {e.stopPropagation(); setIsDropdownOpen(!isDropdownOpen);}}
           onMouseLeave={handleMouseLeave}
         >
           <span className="burger-icon">☰</span>
@@ -93,46 +109,51 @@ const Header = ({ user = null, logout = () => {} }) => {
           {/* Dropdown Content */}
           {isDropdownOpen && (
             <div className="burger-dropdown">
-              <div className="dropdown-search">
-                <form className="dropdown-search-bar" role="search">
-                  <input 
-                    type="text" 
-                    placeholder="Search..." 
-                    aria-label="Search products"
-                  />
-                  <Search size={18} className="search-icon" />
-                </form>
+              <div className='burger-top'>
+                <div className="dropdown-search">
+                  <form className="dropdown-search-bar" role="search">
+                    <input 
+                      type="text" 
+                      placeholder="Search..." 
+                      aria-label="Search products"
+                    />
+                    <Search size={18} className="search-icon" />
+                  </form>
+                </div>
+
+                <div className='cancel' onClick={handleCloseDropdown}>x</div>
               </div>
-              
-              <div className="nav-iconss">
-                {/* Map through iconData array */}
-                {iconData.map((item, index) => {
-                  const IconComponent = item.icon;
-                  return (
-                    <div key={item.id} className="icon-container">
-                      <IconComponent
-                        size={24} 
-                        className={`icon-hover ${item.className}`}
-                        onMouseEnter={() => handleHovered(index)}
-                        onMouseLeave={handleNotHovered}
-                      />
-                      {/* Show label only for the hovered icon */}
-                      {isHovered === index && (
+              <div className='nav-container'>
+                <div className="nav-iconss">
+                  {/* Map through iconData array */}
+                  {iconData.map((item, index) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <div key={item.id} className="icon-container">
+                        <IconComponent
+                          size={24} 
+                          className={`icon-hover ${item.className}`}
+                          onMouseEnter={() => handleHovered(index)}
+                          onClick={() => handleIconClick(index)}
+                          onMouseLeave={handleNotHovered}
+                        />
+                        {activeIcon === index && ( // ← ONLY check activeIcon
                         <div className="icon-label">
                           {item.label}
                         </div>
                       )}
-                    </div>
-                  );
-                })}
-                
-                <button className='product-btn1'>
-                  <Link to="/addProduct" className='product-btn1'>
-                    <PlusCircle size={20} className="btn-icon" />
-                    <span>Add Product</span>
-                  </Link>
-                </button>
-              </div>
+                      </div>
+                    );
+                  })}
+                  
+                </div>
+                  <button className='product-btn1'>
+                    <Link to="/addProduct" className='product-btn1'>
+                      <PlusCircle size={20} className="btn-icon" />
+                      <span>Add Product</span>
+                    </Link>
+                  </button>
+              </div>  
             </div>
           )}
         </div>

@@ -71,6 +71,13 @@
   gap: 20px;
 }
 
+.nav-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
 .heart-icon {
   color: red;       /* This changes the outline color to red */
   fill: red !important;         /* This fills the inside of the heart */
@@ -222,6 +229,12 @@
 
 /* Burger Menu Styles */
 .burger-menu {
+  display: none; /* Hidden by default on desktop */
+  position: relative;
+  cursor: pointer;
+}
+
+.burger-menu1 {
   display: none; /* Hidden by default on desktop */
   position: relative;
   cursor: pointer;
@@ -384,6 +397,16 @@
   align-items: center;
   gap: 20px;
   position: relative;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  position: relative;
 }
 
 @media (max-width: 1015px){
@@ -393,10 +416,42 @@
   .nav-icons{
     display: none;
   }
+  .burger-menu1{
+    display: block;
+  }
 }
 
 @media (max-width: 430px){
-  .nav-iconss{
-    display: flex
+  .nav-container{
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 320px){
+  .burger-dropdown {
+    top: 100%;
+    right: -35px;
+    min-width: 250px;
+  }
+}
+
+.cancel{
+  font-size: 40px;
+  font-weight: 400;
+  padding-bottom: 20px;
+}
+
+.burger-top{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+
+@media (max-width: 1060px){
+  .search-icon{
+    gap: 1.2rem;
   }
 }
