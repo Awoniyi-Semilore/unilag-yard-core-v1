@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getProducts, addSampleProducts } from '../utils/firebaseProducts'; // ✅ FIREBASE
+import { getProducts, addSampleProducts } from '../utils/firebaseProducts';
 import '../component/CSS/Home.css';
 import homePageImage from "../media/homePageImage.jpg";
 import { Link } from 'react-router-dom';
@@ -71,6 +71,7 @@ const Home = () => {
   };
 
   const handleCategoryClick = (categoryName) => {
+    console.log('🎯 [DEBUG] Category clicked:', categoryName);
     if (selectedCategory === categoryName) {
       setSelectedCategory(null);
       setDisplayMode('featured');
@@ -82,38 +83,55 @@ const Home = () => {
   };
 
   const handleSubcategoryClick = async (subcategory) => {
-  console.log('🔍 [DEBUG] Filtering:', selectedCategory, '->', subcategory);
-  
-  setSelectedSubcategory(subcategory);
-  setDisplayMode('products');
-  
-  try {
-    let products;
-    if (subcategory === "Featured") {
-      products = await getProducts({ featured: true });
-    } else {
-      // Debug: Check what we're sending to Firebase
-      console.log('🔍 [DEBUG] Firebase query:', {
-        category: selectedCategory,
-        subcategory: subcategory
-      });
-      
-      products = await getProducts({ 
-        category: selectedCategory, 
-        subcategory: subcategory 
-      });
-      
-      console.log('🔍 [DEBUG] Firebase returned:', products.length, 'products');
-      console.log('🔍 [DEBUG] Product subcategories:', products.map(p => p.subcategory));
-    }
+    console.log('🔍 [DEBUG] Subcategory clicked:', subcategory);
+    console.log('🔍 [DEBUG] Selected category:', selectedCategory);
     
-    setFilteredProducts(products);
-  } catch (error) {
-    console.error('Error filtering products:', error);
-  }
-};
+    setSelectedSubcategory(subcategory);
+    setDisplayMode('products');
+    
+    // Use setTimeout to ensure state is updated before making the API call
+    setTimeout(async () => {
+      try {
+        let products;
+        if (subcategory === "Featured") {
+          console.log('🎯 [DEBUG] Fetching featured products');
+          products = await getProducts({ featured: true });
+        } else {
+          console.log('🎯 [DEBUG] Fetching filtered products:', {
+            category: selectedCategory,
+            subcategory: subcategory
+          });
+          
+          products = await getProducts({ 
+            category: selectedCategory, 
+            subcategory: subcategory 
+          });
+          
+          console.log('🎯 [DEBUG] Filtered products found:', products.length);
+          if (products.length > 0) {
+            console.log('🎯 [DEBUG] Product details:', products.map(p => ({
+              title: p.title,
+              category: p.category,
+              subcategory: p.subcategory
+            })));
+          }
+        }
+        
+        setFilteredProducts(products);
+      } catch (error) {
+        console.error('Error filtering products:', error);
+        // Fallback to client-side filtering
+        const filtered = allProducts.filter(product => 
+          product.subcategory === subcategory
+        );
+        console.log('🎯 [DEBUG] Fallback filtering found:', filtered.length, 'products');
+        setFilteredProducts(filtered);
+      }
+    }, 50);
+  };
 
   const handleShowFeatured = async () => {
+    console.log('🔥 [DEBUG] Showing featured products');
     setDisplayMode('featured');
     setSelectedSubcategory(null);
     setSelectedCategory(null);
@@ -122,6 +140,7 @@ const Home = () => {
   };
 
   const closeSubcategories = () => {
+    console.log('❌ [DEBUG] Closing subcategories');
     setSelectedCategory(null);
     setDisplayMode('featured');
     handleShowFeatured();
@@ -145,7 +164,30 @@ const Home = () => {
 
   return (
     <div className='home'>
-      {/* Top Section - Keep exactly as you had it */}
+      {/* Debug Test Button */}
+      <div style={{
+        position: 'fixed', 
+        top: '10px', 
+        right: '10px', 
+        background: '#2e7d32', 
+        color: 'white', 
+        padding: '10px',
+        borderRadius: '5px',
+        zIndex: 1000,
+        fontSize: '12px'
+      }}>
+        <button onClick={() => {
+          console.log('🧪 [TEST] Manual filter test');
+          setSelectedCategory('Electronics & Gadgets');
+          setTimeout(() => {
+            handleSubcategoryClick('Laptops & Computers');
+          }, 100);
+        }} style={{background: 'none', border: 'none', color: 'white', cursor: 'pointer'}}>
+          🧪 TEST FILTER
+        </button>
+      </div>
+
+      {/* Top Section */}
       <div className='homeTop'>
         <div className='homeTopLeft'>
           <h5>The Official Marketplace for UNILAG Students.</h5>
@@ -184,6 +226,7 @@ const Home = () => {
                 <div 
                   className='homeCategory'
                   onClick={() => handleCategoryClick(categoryName)}
+                  style={{cursor: 'pointer'}}
                 >
                   {categoryIcons[categoryName]}
                   <h3>{categoryName}</h3>
@@ -240,7 +283,12 @@ const Home = () => {
                       <div 
                         key={subcat} 
                         className="subcategory-card"
-                        onClick={() => handleSubcategoryClick(subcat)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('🖱️ [DEBUG] Subcategory card clicked:', subcat);
+                          handleSubcategoryClick(subcat);
+                        }}
+                        style={{cursor: 'pointer'}}
                       >
                         <span>{subcat}</span>
                         <ChevronRight size={16} color="#666" />
@@ -316,18 +364,18 @@ const Home = () => {
                         </div>
                       </div>
                     ))
-                  ) : (
+                  ) : displayMode === 'products' ? (
                     <div className="no-products">
                       <div className="no-products-content">
                         <Flame size={48} color="#ccc" />
-                        <h3>No products found</h3>
+                        <h3>No products found in this category</h3>
                         <p>Try browsing different categories or check back later</p>
                         <button className="safety-btn" onClick={handleShowFeatured} style={{marginTop: '16px'}}>
                           Show Featured Products
                         </button>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               )}
             </>
