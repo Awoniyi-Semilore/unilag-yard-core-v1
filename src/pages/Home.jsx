@@ -82,30 +82,36 @@ const Home = () => {
   };
 
   const handleSubcategoryClick = async (subcategory) => {
-    console.log('🔍 Filtering:', selectedCategory, '->', subcategory);
-    setSelectedSubcategory(subcategory);
-    setDisplayMode('products');
-    
-    try {
-      let products;
-      if (subcategory === "Featured") {
-        products = await getProducts({ featured: true });
-      } else {
-        products = await getProducts({ 
-          category: selectedCategory, 
-          subcategory: subcategory 
-        });
-      }
-      setFilteredProducts(products);
-    } catch (error) {
-      console.error('Error filtering products:', error);
-      // Fallback to client-side filtering
-      const filtered = allProducts.filter(product => 
-        product.subcategory === subcategory
-      );
-      setFilteredProducts(filtered);
+  console.log('🔍 [DEBUG] Filtering:', selectedCategory, '->', subcategory);
+  
+  setSelectedSubcategory(subcategory);
+  setDisplayMode('products');
+  
+  try {
+    let products;
+    if (subcategory === "Featured") {
+      products = await getProducts({ featured: true });
+    } else {
+      // Debug: Check what we're sending to Firebase
+      console.log('🔍 [DEBUG] Firebase query:', {
+        category: selectedCategory,
+        subcategory: subcategory
+      });
+      
+      products = await getProducts({ 
+        category: selectedCategory, 
+        subcategory: subcategory 
+      });
+      
+      console.log('🔍 [DEBUG] Firebase returned:', products.length, 'products');
+      console.log('🔍 [DEBUG] Product subcategories:', products.map(p => p.subcategory));
     }
-  };
+    
+    setFilteredProducts(products);
+  } catch (error) {
+    console.error('Error filtering products:', error);
+  }
+};
 
   const handleShowFeatured = async () => {
     setDisplayMode('featured');

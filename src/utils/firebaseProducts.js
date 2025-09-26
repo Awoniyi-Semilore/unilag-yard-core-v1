@@ -10,10 +10,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '../pages/firebase';
 
-// Get products from Firebase
+// Get products from Firebase - SINGLE FUNCTION DEFINITION
 export const getProducts = async (filters = {}) => {
   try {
-    console.log('📦 Fetching products from Firebase...');
+    console.log('📦 Fetching products from Firebase with filters:', filters);
     
     let q = collection(db, 'products');
     
@@ -30,8 +30,9 @@ export const getProducts = async (filters = {}) => {
       q = query(q, where('subcategory', '==', filters.subcategory));
     }
     
-    // Only get active products, newest first
-    q = query(q, where('isActive', '==', true), orderBy('createdAt', 'desc'));
+    // Only get active products
+    q = query(q, where('isActive', '==', true));
+    // Remove orderBy temporarily to avoid index issues: , orderBy('createdAt', 'desc')
     
     const snapshot = await getDocs(q);
     const products = [];
@@ -45,6 +46,16 @@ export const getProducts = async (filters = {}) => {
         createdAt: data.createdAt?.toDate?.() || new Date()
       });
     });
+    
+    // 🔥 NEW: If no products found with exact match, try case-insensitive fallback
+    if (products.length === 0 && filters.subcategory) {
+      console.log('🔍 No exact matches found, trying case-insensitive search...');
+      const allProducts = await getProducts({ category: filters.category });
+      const filtered = allProducts.filter(product => 
+        product.subcategory.toLowerCase().includes(filters.subcategory.toLowerCase())
+      );
+      return filtered;
+    }
     
     console.log(`✅ Found ${products.length} products`);
     return products;
