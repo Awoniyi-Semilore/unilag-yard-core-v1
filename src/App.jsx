@@ -16,6 +16,7 @@ import Contact from './pages/Contact';
 import TermsOfUse from './pages/TermsOfUse';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import GuestHome from './pages/GuestHome';
+import ProductDetail from './pages/ProductDetail/ProductDetail';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -65,6 +66,7 @@ function App() {
       <Route path="/guest-home" element={<GuestHome />} />
       <Route path="/ForgottenPassword" element={<ForgottenPassword />} />
       <Route path="/howItWorks" element={<Layout><HowItWorks /></Layout>} />
+      <Route path='/productDetail' element={< ProductDetail/>} />
     </Routes>
   );
 }

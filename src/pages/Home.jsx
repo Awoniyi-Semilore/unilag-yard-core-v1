@@ -4,6 +4,7 @@ import '../component/CSS/Home.css';
 import homePageImage from "../media/homePageImage.jpg";
 import { Link } from 'react-router-dom';
 import homeImg from '../media/Selection.jpg';
+import { Link } from 'react-router-dom';
 import { 
   BookOpen, Smartphone, BedDouble, Shirt, Ticket, Gift, 
   ChevronRight, Shield, CheckCircle, Settings, Flame, X,
@@ -381,10 +382,10 @@ const Home = () => {
                           </div>
                           
                           <div className="card-actions">
-                            <button className="message-btn">
+                            <Link to={`/product/${product.id}`} className="message-btn">
                               <MessageCircle size={16} />
                               See More
-                            </button>
+                            </Link>
                           </div>
                         </div>
                       </div>
