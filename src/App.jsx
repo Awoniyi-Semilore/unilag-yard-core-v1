@@ -66,7 +66,15 @@ function App() {
       <Route path="/guest-home" element={<GuestHome />} />
       <Route path="/ForgottenPassword" element={<ForgottenPassword />} />
       <Route path="/howItWorks" element={<Layout><HowItWorks /></Layout>} />
-      <Route path='/productDetail' element={< ProductDetail/>} />
+      <Route path='/product/:productId' element={< ProductDetail/>} />
+      <Route 
+        path='/product/:productId' 
+        element={
+          <Layout>
+            <ProductDetail />
+          </Layout>
+        } 
+      />
     </Routes>
   );
 }

@@ -4,7 +4,7 @@ import '../component/CSS/Home.css';
 import homePageImage from "../media/homePageImage.jpg";
 import { Link } from 'react-router-dom';
 import homeImg from '../media/Selection.jpg';
-import { Link } from 'react-router-dom';
+import {db} from './firebase'
 import { 
   BookOpen, Smartphone, BedDouble, Shirt, Ticket, Gift, 
   ChevronRight, Shield, CheckCircle, Settings, Flame, X,
@@ -341,69 +341,76 @@ const Home = () => {
               )}
 
               {/* Products Grid */}
-              {(displayMode === 'featured' || displayMode === 'products') && (
-                <div className='homeCards'>
-                  {filteredProducts.length > 0 ? (
-                    filteredProducts.map(product => (
-                      <div key={product.id} className='homeCard'>
-                        <div className="card-image-container">
-                          <img src={homeImg} alt={product.title} />
-                          {product.featured && (
-                            <div className="featured-badge">
-                              <Flame size={12} />
-                              Featured
-                            </div>
-                          )}
-                          <div className="condition-badge">{product.condition}</div>
-                        </div>
-                        
-                        <div className="card-content">
-                          <div className="card-header">
-                            <h3 className="product-title">{product.title}</h3>
-                            <div className="price-section">
-                              <span className="current-price">₦ {product.price?.toLocaleString()}</span>
-                              {product.originalPrice && (
-                                <span className="original-price">₦ {product.originalPrice.toLocaleString()}</span>
+                {(displayMode === 'featured' || displayMode === 'products') && (
+                  <div className='homeCards'>
+                    {filteredProducts.length > 0 ? (
+                      filteredProducts.map(product => (
+                        <Link 
+                          to={`/product/${product.id}`} 
+                          key={product.id} 
+                          className='homeCard-link' // Added a new class for the link
+                        >
+                          <div className='homeCard'>
+                            <div className="card-image-container">
+                              <img src={homeImg} alt={product.title} />
+                              {product.featured && (
+                                <div className="featured-badge">
+                                  <Flame size={12} />
+                                  Featured
+                                </div>
                               )}
+                              <div className="condition-badge">{product.condition}</div>
+                            </div>
+                            
+                            <div className="card-content">
+                              <div className="card-header">
+                                <h3 className="product-title">{product.title}</h3>
+                                <div className="price-section">
+                                  <span className="current-price">₦ {product.price?.toLocaleString()}</span>
+                                  {product.originalPrice && (
+                                    <span className="original-price">₦ {product.originalPrice.toLocaleString()}</span>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <p className="product-description">{product.description}</p>
+                              
+                              <div className="product-meta">
+                                <div className="meta-item">
+                                  <MapPin size={14} />
+                                  <span>{product.location}</span>
+                                </div>
+                                <div className="meta-item">
+                                  <Clock size={14} />
+                                  <span>{product.views} views</span>
+                                </div>
+                              </div>
+                              
+                              {/* REMOVED the button since the entire card is now clickable */}
+                              <div className="card-actions">
+                                <div className="see-more-indicator">
+                                  <MessageCircle size={16} />
+                                  Click to view details
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          
-                          <p className="product-description">{product.description}</p>
-                          
-                          <div className="product-meta">
-                            <div className="meta-item">
-                              <MapPin size={14} />
-                              <span>{product.location}</span>
-                            </div>
-                            <div className="meta-item">
-                              <Clock size={14} />
-                              <span>{product.views} views</span>
-                            </div>
-                          </div>
-                          
-                          <div className="card-actions">
-                            <Link to={`/product/${product.id}`} className="message-btn">
-                              <MessageCircle size={16} />
-                              See More
-                            </Link>
-                          </div>
+                        </Link>
+                      ))
+                    ) : displayMode === 'products' ? (
+                      <div className="no-products">
+                        <div className="no-products-content">
+                          <Flame size={48} color="#ccc" />
+                          <h3>No products found in this category</h3>
+                          <p>Try browsing different categories or check back later</p>
+                          <button className="safety-btn" onClick={handleShowFeatured}>
+                            Show Featured Products
+                          </button>
                         </div>
                       </div>
-                    ))
-                  ) : displayMode === 'products' ? (
-                    <div className="no-products">
-                      <div className="no-products-content">
-                        <Flame size={48} color="#ccc" />
-                        <h3>No products found in this category</h3>
-                        <p>Try browsing different categories or check back later</p>
-                        <button className="safety-btn" onClick={handleShowFeatured}>
-                          Show Featured Products
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              )}
+                    ) : null}
+                  </div>
+                )}
             </>
           )}
         </div>

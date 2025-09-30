@@ -1411,3 +1411,80 @@
     max-height: none !important;
   }
 }
+
+.message-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none; /* Important for Link */
+  transition: background-color 0.2s ease;
+  justify-content: center;
+}
+
+.message-btn:hover {
+  background-color: #388e3c;
+  text-decoration: none; /* Important for Link */
+  color: white;
+}
+
+/* Make the entire product card clickable */
+.homeCard-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.homeCard {
+  /* Your existing homeCard styles */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.homeCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #2e7d32;
+}
+
+/* Update the see more indicator */
+.see-more-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f8f9fa;
+  color: #2e7d32;
+  border: 1px solid #dfe3e8;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.homeCard:hover .see-more-indicator {
+  background-color: #2e7d32;
+  color: white;
+}
+
+/* Remove any pointer-events that might block clicking */
+.homeCard * {
+  pointer-events: none; /* This prevents inner elements from blocking the link */
+}
+
+/* But allow buttons inside cards to work if needed */
+.homeCard .safety-btn,
+.homeCard .back-button {
+  pointer-events: auto;
+}
