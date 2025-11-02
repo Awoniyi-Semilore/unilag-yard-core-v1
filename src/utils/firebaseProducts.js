@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../pages/firebase';
 
-// Get products from Firebase - SINGLE FUNCTION DEFINITION
+// Get products from Firebase
 export const getProducts = async (filters = {}) => {
   try {
     console.log('📦 Fetching products from Firebase with filters:', filters);
@@ -18,21 +18,22 @@ export const getProducts = async (filters = {}) => {
     let q = collection(db, 'products');
     
     // Apply filters
+    const conditions = [where('isActive', '==', true)];
+    
     if (filters.featured) {
-      q = query(q, where('featured', '==', true));
+      conditions.push(where('featured', '==', true));
     }
     
     if (filters.category) {
-      q = query(q, where('category', '==', filters.category));
+      conditions.push(where('category', '==', filters.category));
     }
     
     if (filters.subcategory) {
-      q = query(q, where('subcategory', '==', filters.subcategory));
+      conditions.push(where('subcategory', '==', filters.subcategory));
     }
     
-    // Only get active products
-    q = query(q, where('isActive', '==', true));
-    // Remove orderBy temporarily to avoid index issues: , orderBy('createdAt', 'desc')
+    // FIXED: Create query with all conditions
+    q = query(q, ...conditions);
     
     const snapshot = await getDocs(q);
     const products = [];
@@ -42,17 +43,16 @@ export const getProducts = async (filters = {}) => {
       products.push({ 
         id: doc.id, 
         ...data,
-        // Convert Firestore timestamp to date
         createdAt: data.createdAt?.toDate?.() || new Date()
       });
     });
     
-    // 🔥 NEW: If no products found with exact match, try case-insensitive fallback
+    // FIXED: Improved fallback search
     if (products.length === 0 && filters.subcategory) {
       console.log('🔍 No exact matches found, trying case-insensitive search...');
       const allProducts = await getProducts({ category: filters.category });
       const filtered = allProducts.filter(product => 
-        product.subcategory.toLowerCase().includes(filters.subcategory.toLowerCase())
+        product.subcategory?.toLowerCase().includes(filters.subcategory.toLowerCase())
       );
       return filtered;
     }
@@ -61,11 +61,15 @@ export const getProducts = async (filters = {}) => {
     return products;
   } catch (error) {
     console.error('❌ Error getting products:', error);
-    return []; // Return empty array instead of crashing
+    // FIXED: Better error handling
+    if (error.code === 'failed-precondition') {
+      console.warn('Firestore index needs to be created. Please check Firebase console.');
+    }
+    return [];
   }
 };
 
-// Add sample data to Firebase (run this once)
+// Add sample data to Firebase
 export const addSampleProducts = async () => {
   const sampleProducts = [
     {
@@ -118,14 +122,27 @@ export const addSampleProducts = async () => {
   try {
     console.log('🌱 Adding sample products to Firebase...');
     
+    const results = [];
     for (const product of sampleProducts) {
-      await addDoc(collection(db, 'products'), product);
+      const docRef = await addDoc(collection(db, 'products'), product);
+      results.push(docRef.id);
     }
     
-    console.log('✅ Sample products added successfully!');
+    console.log('✅ Sample products added successfully!', results);
     return true;
   } catch (error) {
     console.error('❌ Error adding sample products:', error);
     return false;
+  }
+};
+
+// FIXED: Added missing function to get product by ID
+export const getProductById = async (productId) => {
+  try {
+    const products = await getProducts();
+    return products.find(product => product.id === productId) || null;
+  } catch (error) {
+    console.error('❌ Error getting product by ID:', error);
+    return null;
   }
 };

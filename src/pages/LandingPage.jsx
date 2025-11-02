@@ -1,10 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // ADDED: Proper navigation
 import '../App.css';
-import '../component/CSS/LandingPage.css';
 
 const LandingPage = () => {
+  const navigate = useNavigate(); // ADDED: React Router navigation
+
   const handleGuest = () => {
-    window.location.href = "/guest-home";
+    navigate('/guest-home'); // FIXED: Use navigate instead of window.location
+  };
+
+  const handleLoginSignup = () => {
+    navigate('/login'); // ADDED: Proper navigation
   };
 
   return (
@@ -21,9 +27,9 @@ const LandingPage = () => {
           <button className="cta-button guest-mode" onClick={handleGuest}>
             Browse as Guest
           </button>
-          <a href="/login" className="cta-button login-signup">
+          <button className="cta-button login-signup" onClick={handleLoginSignup}>
             Login / Sign Up
-          </a>
+          </button>
         </div>
       </div>
     </div>

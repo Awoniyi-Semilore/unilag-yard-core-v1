@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { auth } from '../pages/firebase';
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { AuthContext } from '../pages/AuthContext'; // FIXED: Use AuthContext
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../pages/firebase';
+import { db } from '../pages/firebase'; // FIXED: Consistent import path
 
+// SIMPLIFIED password validation
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
@@ -15,28 +15,8 @@ const schema = yup.object().shape({
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup
     .string()
-    .required('Password is required')
-    .test('password-strength', 'Password must meet requirements', function (value) {
-      const errors = [];
-      if (!value) return this.createError({ message: 'Password is required' });
-
-      if (value.length < 6) {
-        errors.push('Minimum 6 characters');
-      }
-      if (!/[A-Z]/.test(value)) {
-        errors.push('At least one uppercase letter');
-      }
-      if (!/[a-z]/.test(value)) {
-        errors.push('At least one lowercase letter');
-      }
-      if (! /[!@#$%^&*(),.?":{}|<> ]/ .test(value)) {
-        errors.push('At least one symbol');
-      }
-
-      return errors.length
-        ? this.createError({ message: errors.join(', ') })
-        : true;
-  }),
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match')
@@ -48,18 +28,15 @@ const schema = yup.object().shape({
 function SignUp() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState({
-    guest: false,
-    login: false
-  });
+  
+  // FIXED: Use AuthContext for signup
+  const { signup, loginWithGoogle, error, clearError, loading } = useContext(AuthContext);
 
   const {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(schema),
@@ -67,62 +44,49 @@ function SignUp() {
   });
 
   const onSubmit = async (data) => {
+    clearError();
+    
     try {
-      setIsLoading({...isLoading, login: true});
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      const user = userCredential.user;
+      const result = await signup(data.email, data.password, data.userName);
+      
+      if (result.success) {
+        // Save additional user data to Firestore
+        const userData = {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          username: data.userName,
+          email: data.email,
+          newsletter: data.newsletter,
+          createdAt: new Date().toISOString(),
+        };
 
-      await updateProfile(user, { displayName: data.userName });
+        // FIXED: Get current user from AuthContext instead of auth.currentUser
+        const { user } = useContext(AuthContext);
+        if (user) {
+          await setDoc(doc(db, "users", user.uid), userData);
+        }
 
-      const userData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.userName,
-        email: data.email,
-        newsletter: data.newsletter,
-      };
-
-      await setDoc(doc(db, "users", user.uid), userData);
-
-      localStorage.setItem("user", JSON.stringify(userData));
-      reset();
-      setIsSuccess(true);
-      setTimeout(() => navigate("/home"), 1500);
-    } catch (error) {
-      if (error.code === 'auth/email-already-in-use') {
-        setErrorMsg("This email is already in use. Please login instead.");
-      } else {
-        setErrorMsg(error.message);
+        reset();
+        setIsSuccess(true);
+        setTimeout(() => navigate("/home"), 1500);
       }
-    } finally {
-      setIsLoading({...isLoading, login: false});
+    } catch (error) {
+      console.error('Signup error:', error);
     }
   };
 
   const handleGoogleSignup = async () => {
-    const provider = new GoogleAuthProvider();
+    clearError();
+    
     try {
-      setIsLoading({...isLoading, guest: true});
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      const userData = {
-        username: user.displayName || "Google User",
-        email: user.email,
-        photoURL: user.photoURL || null,
-        newsletter: "no",
-      };
-
-      await setDoc(doc(db, "users", user.uid), userData);
-
-      localStorage.setItem("user", JSON.stringify(userData));
-      setIsSuccess(true);
-      setTimeout(() => navigate("/home"), 1500);
+      const result = await loginWithGoogle();
+      if (result.success) {
+        // Google signup successful - user data is handled in AuthContext
+        setIsSuccess(true);
+        setTimeout(() => navigate("/home"), 1500);
+      }
     } catch (error) {
-      console.error("Google sign-up failed:", error);
-      setErrorMsg("Google sign-up failed. Try again.");
-    } finally {
-      setIsLoading({...isLoading, guest: false});
+      console.error('Google signup error:', error);
     }
   };
 
@@ -131,32 +95,36 @@ function SignUp() {
       <div className="auth-card">
         <h2 className="auth-title">Create Your Account</h2>
         
-        {errorMsg && <div className="auth-error">{errorMsg}</div>}
+        {error && <div className="auth-error">{error}</div>}
         {isSuccess && <div className="auth-success">Account created successfully! Redirecting...</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="firstName">First Name</label>
-            <input 
-              id="firstName"
-              type="text" 
-              placeholder="John"
-              {...register("firstName")} 
-              className={errors.firstName ? 'input-error' : ''}
-            />
-            {errors.firstName && <span className="error-message">{errors.firstName.message}</span>}
-          </div>
+          <div className="name-fields">
+            <div className="form-group">
+              <label htmlFor="firstName">First Name</label>
+              <input 
+                id="firstName"
+                type="text" 
+                placeholder="John"
+                {...register("firstName")} 
+                className={errors.firstName ? 'input-error' : ''}
+                disabled={loading}
+              />
+              {errors.firstName && <span className="error-message">{errors.firstName.message}</span>}
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="lastName">Last Name</label>
-            <input 
-              id="lastName"
-              type="text" 
-              placeholder="Doe"
-              {...register("lastName")} 
-              className={errors.lastName ? 'input-error' : ''}
-            />
-            {errors.lastName && <span className="error-message">{errors.lastName.message}</span>}
+            <div className="form-group">
+              <label htmlFor="lastName">Last Name</label>
+              <input 
+                id="lastName"
+                type="text" 
+                placeholder="Doe"
+                {...register("lastName")} 
+                className={errors.lastName ? 'input-error' : ''}
+                disabled={loading}
+              />
+              {errors.lastName && <span className="error-message">{errors.lastName.message}</span>}
+            </div>
           </div>
 
           <div className="form-group">
@@ -167,6 +135,7 @@ function SignUp() {
               placeholder="johndoe123"
               {...register("userName")} 
               className={errors.userName ? 'input-error' : ''}
+              disabled={loading}
             />
             {errors.userName && <span className="error-message">{errors.userName.message}</span>}
           </div>
@@ -179,27 +148,27 @@ function SignUp() {
               placeholder="john@example.com"
               {...register("email")} 
               className={errors.email ? 'input-error' : ''}
+              disabled={loading}
             />
             {errors.email && <span className="error-message">{errors.email.message}</span>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">
-              Password
-              <span className="password-hint">(min 6 chars, 1 uppercase, 1 symbol)</span>
-            </label>
+            <label htmlFor="password">Password</label>
             <div className="password-wrapper">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="At least 6 characters"
                 {...register("password")}
                 className={errors.password ? 'input-error' : ''}
+                disabled={loading}
               />
               <button 
                 type="button" 
                 onClick={() => setShowPassword(!showPassword)}
                 className="password-toggle"
+                disabled={loading}
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -212,17 +181,18 @@ function SignUp() {
             <input
               id="confirmPassword"
               type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder="Confirm your password"
               {...register("confirmPassword")}
               className={errors.confirmPassword ? 'input-error' : ''}
+              disabled={loading}
             />
             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword.message}</span>}
           </div>
 
           <div className="form-group checkbox-group">
             <label>
-              <input type="checkbox" {...register("terms")} />
-              <span>I accept the <Link to="/terms" className="terms-link">Terms and Conditions</Link></span>
+              <input type="checkbox" {...register("terms")} disabled={loading} />
+              <span>I accept the <Link to="/termsOfUse" className="terms-link">Terms and Conditions</Link></span>
             </label>
             {errors.terms && <span className="error-message">{errors.terms.message}</span>}
           </div>
@@ -233,11 +203,11 @@ function SignUp() {
             
             <div className="radio-group">
               <label>
-                <input type="radio" value="yes" {...register("newsletter")} />
+                <input type="radio" value="yes" {...register("newsletter")} disabled={loading} />
                 <span>Yes, I'd love helpful reminders!</span>
               </label>
               <label>
-                <input type="radio" value="no" {...register("newsletter")} />
+                <input type="radio" value="no" {...register("newsletter")} disabled={loading} />
                 <span>No thanks, not right now.</span>
               </label>
             </div>
@@ -247,13 +217,9 @@ function SignUp() {
           <button 
             type="submit" 
             className="submit-btn"
-            disabled={!isValid || isLoading.login}
+            disabled={!isValid || loading}
           >
-            {isLoading.login ? (
-              <span className="loading-spinner"></span>
-            ) : (
-              'Create Account'
-            )}
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
@@ -264,18 +230,14 @@ function SignUp() {
         <button 
           onClick={handleGoogleSignup}
           className="google-btn"
-          disabled={isLoading.guest}
+          disabled={loading}
         >
           <img 
-            src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" 
-            alt="Google logo" 
+            src="https://www.google.com/favicon.ico" 
+            alt="Google" 
             className="google-icon"
           />
-          {isLoading.guest ? (
-            <span className="loading-spinner"></span>
-          ) : (
-            'Continue with Google'
-          )}
+          {loading ? 'Signing up...' : 'Sign up with Google'}
         </button>
 
         <p className="auth-footer">
