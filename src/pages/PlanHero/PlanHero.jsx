@@ -1,5 +1,6 @@
 import React from 'react';
 import '../PlanHero/PlanHero.CSS'; // We'll create this CSS file
+import { Link } from 'react-router-dom';
 
 const PlanHero = () => {
   return (
@@ -14,6 +15,7 @@ const PlanHero = () => {
       <div className="hero-content">
         <h1>Turn Your Campus Clutter into Cash.</h1>
         <p>Why let your skills and old items go to waste? Monetize them safely within campus, fund your next adventure, and connect with the UNILAG community.</p>
+        <Link to='howItWorks' className='Btn-1'>See How it Works</Link>
       </div>
     </section>
   );
