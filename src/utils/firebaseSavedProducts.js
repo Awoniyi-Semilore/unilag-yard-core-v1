@@ -1,14 +1,17 @@
-// src/utils/firebaseProducts.js
 import { 
   collection, 
-  addDoc, 
+  doc, 
+  setDoc, 
+  deleteDoc, 
   getDocs, 
   query, 
-  where, 
-  orderBy,
-  serverTimestamp 
+  where,
+  getDoc,
+  arrayUnion,
+  arrayRemove,
+  updateDoc
 } from 'firebase/firestore';
-import { db } from '../pages/firebase';
+import { db, auth } from '../pages/firebase';
 
 // Save a product for a user
 export const saveProduct = async (userId, productId) => {
@@ -29,15 +32,7 @@ export const saveProduct = async (userId, productId) => {
     return true;
   } catch (error) {
     console.error('❌ Error saving product:', error);
-    
-    // Handle specific Firebase errors
-    if (error.code === 'permission-denied') {
-      throw new Error('You do not have permission to save products. Please make sure you are signed in.');
-    } else if (error.code === 'unauthenticated') {
-      throw new Error('Please sign in to save products.');
-    } else {
-      throw new Error('Failed to save product. Please try again.');
-    }
+    throw error;
   }
 };
 
@@ -55,13 +50,7 @@ export const unsaveProduct = async (userId, productId) => {
     return true;
   } catch (error) {
     console.error('❌ Error removing saved product:', error);
-    
-    // Handle specific Firebase errors
-    if (error.code === 'permission-denied') {
-      throw new Error('You do not have permission to modify saved products. Please make sure you are signed in.');
-    } else {
-      throw new Error('Failed to remove product from saved items. Please try again.');
-    }
+    throw error;
   }
 };
 
@@ -78,14 +67,7 @@ export const isProductSaved = async (userId, productId) => {
     return savedProductSnap.exists();
   } catch (error) {
     console.error('❌ Error checking saved product:', error);
-    
-    // If it's a permission error, just return false instead of throwing
-    if (error.code === 'permission-denied' || error.code === 'unauthenticated') {
-      return false;
-    }
-    
-    // For other errors, rethrow
-    throw error;
+    return false;
   }
 };
 
@@ -132,13 +114,6 @@ export const getSavedProducts = async (userId) => {
     return products;
   } catch (error) {
     console.error('❌ Error getting saved products:', error);
-    
-    // Handle permission errors gracefully
-    if (error.code === 'permission-denied' || error.code === 'unauthenticated') {
-      console.log('User not authenticated, returning empty array');
-      return [];
-    }
-    
     return [];
   }
 };
@@ -159,12 +134,6 @@ export const getSavedProductsCount = async (userId) => {
     return querySnapshot.size;
   } catch (error) {
     console.error('❌ Error getting saved products count:', error);
-    
-    // Handle permission errors gracefully
-    if (error.code === 'permission-denied' || error.code === 'unauthenticated') {
-      return 0;
-    }
-    
     return 0;
   }
 };

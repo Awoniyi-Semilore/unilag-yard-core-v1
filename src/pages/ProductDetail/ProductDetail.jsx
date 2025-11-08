@@ -2,31 +2,37 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase'; 
+import { saveProduct, unsaveProduct, isProductSaved } from '../../utils/firebaseSavedProducts';
+import { auth } from '../firebase';
 import '../ProductDetail/ProductDetail.css';
+  {
+    alert('Please sign in to save products');
+    navigate('/login'); // Optional: redirect to login
+    return;
+  }
 
-const ProductDetail = () => {
-    const { productId } = useParams();
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [selectedImage, setSelectedImage] = useState(0);
+  setSaving(true);
+  try {
+    if (isSaved) {
+      await unsaveProduct(user.uid, productId);
+      setIsSaved(false);
+    } else {
+      await saveProduct(user.uid, productId);
+      setIsSaved(true);
+    }
+  } catch (error) {
+    console.error('Error toggling save:', error);
+    
+    // Show user-friendly error messages
+    if (error.message.includes('permission') || error.message.includes('sign in')) {
+      alert(error.message);
+    } else {
+      alert('Failed to update saved products. Please try again.');
+    }
+  } finally {
+    setSaving(false);
+  }
 
-    // Get actual product images from Firestore data
-    const productImages = product?.imageUrls || 
-                         (product?.imageUrl ? [product.imageUrl] : ['/default-image.jpg']);
-
-    // Navigation functions
-    const nextImage = () => {
-        setSelectedImage((prev) => 
-            prev === productImages.length - 1 ? 0 : prev + 1
-        );
-    };
-
-    const prevImage = () => {
-        setSelectedImage((prev) => 
-            prev === 0 ? productImages.length - 1 : prev - 1
-        );
-    };
 
     // Keyboard navigation
     useEffect(() => {
@@ -268,9 +274,15 @@ const ProductDetail = () => {
                                 <span className="button-icon">💬</span>
                                 Message Seller
                             </button>
-                            <button className="secondary-cta">
-                                <span className="button-icon">❤️</span>
-                                Save for Later
+                            <button 
+                                className={`secondary-cta ${isSaved ? 'saved' : ''}`}
+                                onClick={handleSaveToggle}
+                                disabled={saving}
+                            >
+                                <span className="button-icon">
+                                    {isSaved ? '💖' : '🤍'}
+                                </span>
+                                {saving ? 'Saving...' : (isSaved ? 'Saved' : 'Save for Later')}
                             </button>
                             <div className="button-group">
                                 <button className="share-btn">
@@ -288,6 +300,5 @@ const ProductDetail = () => {
             </div>
         </div>
     );
-}
 
 export default ProductDetail;

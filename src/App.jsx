@@ -9,7 +9,7 @@ import Footer from './component/Footer';
 import Login from './pages/Login/Login';
 import Signup from './pages/SignUp';
 import HowItWorks from './pages/HowItWorks';
-import { AuthContext } from './pages/AuthContext'; // FIXED: Import AuthContext
+import { AuthContext } from './pages/AuthContext';
 import ForgottenPassword from './pages/ForgottenPassword';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -17,10 +17,14 @@ import TermsOfUse from './pages/TermsOfUse';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import GuestHome from './pages/GuestHome';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
+import SellerVerification from './pages/SellerVerification';
+import Payment from './component/Payment/Payment';
+import SubmitProduct from './pages/submit/submitProduct';
+import SavedProducts from './pages/SavedProducts.jsx';
 
 function Layout({ children }) {
   const location = useLocation();
-  const hideHeaderFooterOn = ['/login', '/signup', '/forgottenpassword']; // ADDED: forgottenpassword
+  const hideHeaderFooterOn = ['/login', '/signup'];
   const hideUI = hideHeaderFooterOn.includes(location.pathname);
   const { user } = useContext(AuthContext);
 
@@ -36,56 +40,52 @@ function Layout({ children }) {
 function App() {
   const { user, loading } = useContext(AuthContext);
 
-  // FIXED: Better loading state
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  if (loading) return null;
 
   return (
     <Routes>
       <Route
         path="/"
-        element={!user ? <LandingPage /> : <Navigate to="/home" replace />} // ADDED: replace prop
+        element={!user ? <LandingPage /> : <Navigate to="/home" />}
       />
       <Route
         path="/home"
         element={
-          user ? <Layout><Home /></Layout> : <Navigate to="/login" replace />
+          user ? <Layout><Home /></Layout> : <Navigate to="/login" />
         }
       />
       <Route
         path="/addProduct"
         element={
-          user ? <Layout><AddProduct /></Layout> : <Navigate to="/login" replace />
+          user ? <Layout><AddProduct /></Layout> : <Navigate to="/login" />
         }
       />
-      {/* FIXED: Made these routes accessible without auth */}
+      
+      {/* ADD PAYMENT ROUTES */}
+      <Route
+        path="/payment"
+        element={
+          user ? <Layout><Payment /></Layout> : <Navigate to="/login" />
+        }
+      />
+      <Route
+        path="/submit-product"
+        element={
+          user ? <Layout><SubmitProduct /></Layout> : <Navigate to="/login" />
+        }
+      />
+      
       <Route path="/allProduct" element={<Layout><AllProduct /></Layout>} />
       <Route path="/about" element={<Layout><About /></Layout>} />
       <Route path="/contact" element={<Layout><Contact /></Layout>} />
       <Route path="/termsOfUse" element={<Layout><TermsOfUse /></Layout>} />
       <Route path="/privacyPolicy" element={<Layout><PrivacyPolicy /></Layout>} />
-      <Route path="/howItWorks" element={<Layout><HowItWorks /></Layout>} />
-      
-      {/* Auth routes */}
-      <Route 
-        path="/login" 
-        element={!user ? <Login /> : <Navigate to="/home" replace />} // FIXED: Redirect if already logged in
-      />
-      <Route 
-        path="/signup" 
-        element={!user ? <Signup /> : <Navigate to="/home" replace />} // FIXED: Redirect if already logged in
-      />
-      <Route 
-        path="/forgottenpassword" // FIXED: Corrected path
-        element={!user ? <ForgottenPassword /> : <Navigate to="/home" replace />}
-      />
-      
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/guest-home" element={<GuestHome />} />
+      <Route path="/saved-products" element={<SavedProducts />} />
+      <Route path="/ForgottenPassword" element={<ForgottenPassword />} />
+      <Route path="/howItWorks" element={<Layout><HowItWorks /></Layout>} />
       <Route 
         path='/product/:productId' 
         element={
@@ -94,9 +94,6 @@ function App() {
           </Layout>
         } 
       />
-      
-      {/* FIXED: Catch-all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

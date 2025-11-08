@@ -565,3 +565,27 @@
     max-height: calc(100vh - 140px);
     overflow-y: auto;
 }
+
+/* Make icons more clickable */
+.icon-clickable {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.icon-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Improve icon container */
+.icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure product buttons work well */
+.product-btn, .product-btn1 {
+  cursor: pointer;
+}

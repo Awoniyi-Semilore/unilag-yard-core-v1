@@ -386,10 +386,10 @@ const Home = () => {
                                 <MapPin size={14} />
                                 <span>{product.location}</span>
                               </div>
-                              <div className="meta-item">
+                              {/* <div className="meta-item">
                                 <Clock size={14} />
                                 <span>{product.views} views</span>
-                              </div>
+                              </div> */}
                             </div>
                             
                             <div className="card-actions">

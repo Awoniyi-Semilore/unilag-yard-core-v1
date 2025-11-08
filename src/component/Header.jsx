@@ -1,27 +1,70 @@
 import React, { useState } from 'react'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
 import "./CSS/Header.css";
 import { Heart, MessageCircle, ClipboardList, Bell, User, Search, PlusCircle } from "lucide-react";
 
 const Header = ({ user = null, logout = () => {} }) => {
   const [isHovered, setIsHovered] = useState(null);
-  const [activeIcon, setActiveIcon] = useState(null); // ← Add this
+  const [activeIcon, setActiveIcon] = useState(null);
+  const navigate = useNavigate(); // Added for navigation
 
-  const handleIconClick = (index) => {
+  const handleIconClick = (index, id) => {
     // If clicking the same icon again, close it
     if (activeIcon === index) {
       setActiveIcon(null);
     } else {
-      setActiveIcon(index); // Otherwise, open this icon
+      setActiveIcon(index);
     }
+
+    // Handle navigation for specific icons
+    if (id === 'saved') {
+      navigate('/saved-products');
+    }
+    // Add navigation for other icons as needed
+    // if (id === 'messages') {
+    //   navigate('/messages');
+    // }
+    // if (id === 'my-advert') {
+    //   navigate('/my-adverts');
+    // }
   };
 
- const iconData = [
-    { icon: Heart, label: "Saved Items", id: "saved" , className: "heart-icon"},
-    { icon: MessageCircle, label: "Messages", id: "messages" , className: "message-icon" },
-    { icon: ClipboardList, label: "My Adverts", id: "my-advert" , className: "advert-icon" },
-    { icon: Bell, label: "Notifications", id: "notification" , className: "bell-icon" },
-    { icon: User, label: "My Profile", id: "my-profile" , className: "profile-icon" }
+  const iconData = [
+    { 
+      icon: Heart, 
+      label: "Saved Items", 
+      id: "saved", 
+      className: "heart-icon",
+      path: "/saved-products" // Added path for navigation
+    },
+    { 
+      icon: MessageCircle, 
+      label: "Messages", 
+      id: "messages", 
+      className: "message-icon",
+      path: "/messages" // You can add paths for other icons too
+    },
+    { 
+      icon: ClipboardList, 
+      label: "My Adverts", 
+      id: "my-advert", 
+      className: "advert-icon",
+      path: "/my-adverts"
+    },
+    { 
+      icon: Bell, 
+      label: "Notifications", 
+      id: "notification", 
+      className: "bell-icon",
+      path: "/notifications"
+    },
+    { 
+      icon: User, 
+      label: "My Profile", 
+      id: "my-profile", 
+      className: "profile-icon",
+      path: "/profile"
+    }
   ];
 
   const handleHovered = (index) => {
@@ -45,23 +88,30 @@ const Header = ({ user = null, logout = () => {} }) => {
     setIsDropdownOpen(false);
   };
 
+  // Function to handle icon click in dropdown
+  const handleDropdownIconClick = (index, id, path) => {
+    setActiveIcon(index);
+    if (path) {
+      navigate(path);
+      setIsDropdownOpen(false); // Close dropdown after navigation
+    }
+  };
+
   return (
     <header className='header-d'>
         <div className="logo-section">
           <Link to="/home" className='logo'>
             <span className='logo-text1'>Unilag</span> Yard
-            </Link> {/* Added to prop */}
+          </Link>
         </div>
         
         <div className="search-section">
           <form className="search-bar" role="search">
-            {/* Input field */}
             <input 
               type="text" 
               placeholder="Search for books, gadgets, items..." 
               aria-label="Search products"
             />
-            {/* Search icon - placed after the input but inside the same form */}
             <Search size={20} className="search-icon" />
           </form>
         </div>
@@ -72,13 +122,18 @@ const Header = ({ user = null, logout = () => {} }) => {
             const IconComponent = item.icon;
             return (
               <div key={item.id} className="icon-container">
-                <IconComponent
-                  size={24} 
-                  className={`icon-hover ${item.className}`}
-                  onMouseEnter={() => handleHovered(index)}
-                  onMouseLeave={handleNotHovered}
-                  onClick={() => handleIconClick(index)}
-                />
+                {/* Make the icon clickable */}
+                <div 
+                  className="icon-clickable"
+                  onClick={() => handleIconClick(index, item.id)}
+                >
+                  <IconComponent
+                    size={24} 
+                    className={`icon-hover ${item.className}`}
+                    onMouseEnter={() => handleHovered(index)}
+                    onMouseLeave={handleNotHovered}
+                  />
+                </div>
                 {/* Show label for hovered OR clicked icon */}
                 {(isHovered === index || activeIcon === index) && (
                   <div className="icon-label">
@@ -97,7 +152,7 @@ const Header = ({ user = null, logout = () => {} }) => {
           </button>
         </div>
 
-          {/* Burger Menu */}
+        {/* Burger Menu */}
         <div 
           className="burger-menu1" 
           onMouseEnter={handleMouseEnter}
@@ -125,34 +180,38 @@ const Header = ({ user = null, logout = () => {} }) => {
               </div>
               <div className='nav-container'>
                 <div className="nav-iconss">
-                  {/* Map through iconData array */}
+                  {/* Map through iconData array for dropdown */}
                   {iconData.map((item, index) => {
                     const IconComponent = item.icon;
                     return (
                       <div key={item.id} className="icon-container">
-                        <IconComponent
-                          size={24} 
-                          className={`icon-hover ${item.className}`}
-                          onMouseEnter={() => handleHovered(index)}
-                          onClick={() => handleIconClick(index)}
-                          onMouseLeave={handleNotHovered}
-                        />
-                        {activeIcon === index && ( // ← ONLY check activeIcon
-                        <div className="icon-label">
-                          {item.label}
+                        {/* Make dropdown icons clickable with navigation */}
+                        <div 
+                          className="icon-clickable"
+                          onClick={() => handleDropdownIconClick(index, item.id, item.path)}
+                        >
+                          <IconComponent
+                            size={24} 
+                            className={`icon-hover ${item.className}`}
+                            onMouseEnter={() => handleHovered(index)}
+                            onMouseLeave={handleNotHovered}
+                          />
                         </div>
-                      )}
+                        {activeIcon === index && (
+                          <div className="icon-label">
+                            {item.label}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
-                  
                 </div>
-                  <button className='product-btn1'>
-                    <Link to="/addProduct" className='product-btn1'>
-                      <PlusCircle size={20} className="btn-icon" />
-                      <span>Add Product</span>
-                    </Link>
-                  </button>
+                <button className='product-btn1'>
+                  <Link to="/addProduct" className='product-btn1' onClick={() => setIsDropdownOpen(false)}>
+                    <PlusCircle size={20} className="btn-icon" />
+                    <span>Add Product</span>
+                  </Link>
+                </button>
               </div>  
             </div>
           )}
@@ -166,48 +225,4 @@ Header.defaultProps = {
   logout: () => {}
 };
 
-export default Header
-
-
-
-// import React from 'react'
-// import { Link } from "react-router-dom";
-// import "./CSS/Header.css";
-// import { Heart, MessageCircle, ClipboardList, Bell, User, Search, PlusCircle } from "lucide-react";
-
-
-// const Header = ({ user = null, logout = () => {} }) => {
-
-//   return (
-//     <header className='header-div'>
-//       <div>
-//         <div><Link className='logo'>Unilag Yard</Link></div>
-//         <div>
-//           <form class="search-bar" role="search">
-//             <input type="text" placeholder="Search for books, gadgets, items..." 
-//             < Search size={24} color="#4e5d6c" className="icon-hover" /> />
-//             <button type="submit" aria-label="Submit search"></button>
-//           </form>
-//         </div>
-//         <div>
-//           <Heart size={24} color="#4e5d6c" className="icon-hover" />      
-//           <MessageCircle size={24} color="#4e5d6c" className="icon-hover" /> 
-//           <ClipboardList size={24} color="#4e5d6c" className="icon-hover" /> 
-//           <Bell size={24} color="#4e5d6c" className="icon-hover" />       
-//           <User size={24} color="#4e5d6c" className="icon-hover" />
-//           <button className='product-btn'>
-//             <PlusCircle size={24} color="#4e5d6c" className="icon-hover" />
-//             Add Product
-//           </button>
-//         </div>
-//       </div>
-//     </header>
-//   )
-// }
-
-// Header.defaultProps = {
-//   user: null,
-//   logout: () => {}
-// };
-
-// export default Header
+export default Header;
