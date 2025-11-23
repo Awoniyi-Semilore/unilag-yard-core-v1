@@ -407,7 +407,7 @@ const getVerificationBadge = (sellerVerificationStatus) => {
             <div className="empty-icon">
               <Heart size={48} color="#ccc" />
             </div>
-            <h3>No Saved Products Yet</h3>
+            <h3>No Saved Products Yet.</h3>
             <p>Start saving products you're interested in by clicking the heart icon on product pages</p>
             <Link to="/" className="browse-button">
               Browse Products
