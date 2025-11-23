@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import '../Login/Login.css';
 import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../AuthContext';
+import { AuthContext } from '../../Hooks/useAuth';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, Shield, Sparkles } from 'lucide-react';
 import '../Login/Login.css'
