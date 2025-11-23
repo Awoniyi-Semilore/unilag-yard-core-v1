@@ -249,13 +249,13 @@ function SignUp() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <label htmlFor="email">Student Email</label>
+              <label htmlFor="email">Email</label>
               <div className="input-with-icon">
                 <Mail size={18} className="input-icon" />
                 <input 
                   id="email"
                   type="email" 
-                  placeholder="john@student.unilag.edu.ng"
+                  placeholder="john@gmail.com"
                   {...register("email")} 
                   className={errors.email ? 'input-error modern-input' : 'modern-input'}
                   disabled={loading}
