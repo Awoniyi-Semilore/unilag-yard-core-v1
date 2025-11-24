@@ -640,3 +640,80 @@
   padding: 8px 0 !important;
   margin-bottom: 12px !important;
 }
+
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Security Note */
+.security-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #666;
+  margin-top: 20px;
+}
+
+.security-note svg {
+  color: #28a745;
+  flex-shrink: 0;
+}
+
+/* Spam Note */
+.spam-note {
+  display: block;
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff3cd;
+  border-radius: 4px;
+  border-left: 3px solid #ffc107;
+}
+
+/* Back to Login Button */
+.back-to-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.back-to-login-btn:hover {
+  color: #000;
+}
+
+.back-to-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Message Content */
+.message-content {
+  text-align: left;
+}
+
+.message-content strong {
+  display: block;
+  margin-bottom: 5px;
+}
