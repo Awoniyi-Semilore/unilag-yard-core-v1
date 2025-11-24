@@ -19,7 +19,6 @@ import {
   Icon,
   Heading,
   useColorModeValue,
-  Link,
 } from '@chakra-ui/react';
 import { motion, useInView, useAnimation } from 'framer-motion';
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle, ExternalLink } from 'lucide-react';
@@ -87,26 +86,42 @@ const ContactPage = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call - Replace this with actual email service integration
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create WhatsApp message with form data
+      const whatsappMessage = `
+*New Contact Form Submission - UNILAG Yard*
+
+*Name:* ${formData.name}
+*Email:* ${formData.email}
+*Subject:* ${formData.subject}
+
+*Message:*
+${formData.message}
+
+*Submitted via:* UNILAG Yard Contact Form
+      `.trim();
+
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      const whatsappUrl = `https://wa.me/2348066562051?text=${encodedMessage}`;
       
-      // TODO: Replace with actual email service integration
-      // For now, we'll show a success message
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank');
+      
       toast({
-        title: "Message Received!",
-        description: "We've got your message and will respond within 24 hours.",
+        title: "Opening WhatsApp!",
+        description: "Your message is ready to send. Please complete the send in WhatsApp.",
         status: "success",
         duration: 5000,
         isClosable: true,
         position: "top",
       });
 
+      // Reset form
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       toast({
-        title: "Message Failed",
-        description: "Please try again or contact us via WhatsApp.",
+        title: "Failed to Open WhatsApp",
+        description: "Please try again or contact us directly at +2348066562051",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -174,7 +189,7 @@ const ContactPage = () => {
   const borderColor = useColorModeValue('gray.200', 'gray.600');
 
   return (
-    <Box minH="100vh" py={8} mt={8}> {/* Added margin top to bring it down */}
+    <Box minH="100vh" py={8} mt={8}>
       <Container maxW="7xl">
         {/* Main Header */}
         <MotionBox
@@ -197,39 +212,21 @@ const ContactPage = () => {
           textAlign="center"
           mb={12}
         >
-          <MotionHeading
+          <Heading
             size="2xl"
             mb={4}
             color="#2e7d32"
-            initial={{ opacity: 0, y: 30 }}
-            animate={mainControls}
-            variants={{
-              visible: { 
-                opacity: 1, 
-                y: 0,
-                transition: { delay: 0.2, duration: 0.6 }
-              }
-            }}
           >
             Get In Touch
-          </MotionHeading>
-          <MotionText
+          </Heading>
+          <Text
             fontSize="xl"
             color="gray.600"
             maxW="2xl"
             mx="auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={mainControls}
-            variants={{
-              visible: { 
-                opacity: 1, 
-                y: 0,
-                transition: { delay: 0.4, duration: 0.6 }
-              }
-            }}
           >
             Have questions about UNILAG Yard? We're here to help and would love to hear from you.
-          </MotionText>
+          </Text>
         </MotionBox>
 
         <MotionGrid 
@@ -290,7 +287,7 @@ const ContactPage = () => {
                       <Icon as={MessageCircle} w={6} h={6} color="#2e7d32" />
                       <Text fontSize="2xl" fontWeight="bold">Send us a Message</Text>
                     </HStack>
-                    <Text color="gray.600">Fill out the form and our team will get back to you ASAP</Text>
+                    <Text color="gray.600">Fill out the form and we'll open WhatsApp for you to send the message</Text>
                   </Box>
 
                   <form onSubmit={handleSubmit}>
@@ -424,7 +421,7 @@ const ContactPage = () => {
                           size="lg"
                           width="full"
                           isLoading={isSubmitting}
-                          loadingText="Sending..."
+                          loadingText="Preparing WhatsApp..."
                           leftIcon={<Send size={20} />}
                           _hover={{ 
                             bg: '#2e7d32', 
@@ -434,7 +431,7 @@ const ContactPage = () => {
                           transition="all 0.3s"
                           h="56px"
                         >
-                          Send Message
+                          Send via WhatsApp
                         </Button>
                       </MotionBox>
                     </VStack>
