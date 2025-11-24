@@ -1,4 +1,4 @@
-// hooks/useAuth.jsx - COMPLETE VERSION WITH ALL AUTH FUNCTIONS
+// hooks/useAuth.jsx - FIXED VERSION
 import { useState, useEffect, createContext, useContext } from 'react';
 import { 
   onAuthStateChanged, 
@@ -10,8 +10,8 @@ import {
   updateProfile,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { auth } from '../firebase';
-import { getUserProfile, createUserProfile } from '../firebase/auth';
+import { auth, db } from '../firebase'; // ADD db import
+import { doc, setDoc, getDoc } from 'firebase/firestore'; // ADD Firestore imports
 
 export const AuthContext = createContext();
 
@@ -21,6 +21,32 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+};
+
+// ADD these helper functions since they're missing from auth.js
+const getUserProfile = async (userId) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      return { success: true, data: userDoc.data() };
+    }
+    return { success: false, error: 'User profile not found' };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+const createUserProfile = async (userId, userData) => {
+  try {
+    await setDoc(doc(db, 'users', userId), {
+      ...userData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 };
 
 export const AuthProvider = ({ children }) => {
