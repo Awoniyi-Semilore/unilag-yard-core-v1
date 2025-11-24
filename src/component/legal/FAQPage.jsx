@@ -20,7 +20,7 @@ import {
   Link,
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, HelpCircle, BookOpen, Shield, CreditCard, User, ExternalLink } from 'lucide-react';
+import { Search, HelpCircle, BookOpen, Shield, CreditCard, User, ExternalLink, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const MotionBox = motion(Box);
@@ -40,14 +40,21 @@ const FAQPage = () => {
     { id: 'safety', label: 'Safety', icon: Shield, count: 0 },
     { id: 'transactions', label: 'Transactions', icon: CreditCard, count: 0 },
     { id: 'account', label: 'Account', icon: User, count: 0 },
+    { id: 'support', label: 'Support', icon: MessageCircle, count: 0 },
   ];
 
   const faqs = [
     {
-      question: "How do I verify my UNILAG student status?",
-      answer: "We're currently working on implementing a robust student verification system. For now, you'll need to use your official UNILAG email address (@student.unilag.edu.ng) during registration. We're developing additional verification methods to ensure platform safety. [REMINDER: Check verification system progress]",
+      question: "How do I verify my UNILAG student status to sell products?",
+      answer: "To verify as a seller: 1) Submit your details on our verification page 2) We'll send a verification code to your student email (matricno@live.unilag.edu.ng) 3) Go to outlook.live.com and sign in with your student email 4) Check for our verification email and copy the code 5) Paste the code on our website to complete verification. Verification is instant and one-time only for sellers.",
       category: "account",
-      tags: ["verification", "account", "important"]
+      tags: ["verification", "seller", "important"]
+    },
+    {
+      question: "Do buyers need to verify their student status?",
+      answer: "No, buyers only need basic sign-up and login. Student verification is only required for sellers who want to list products on the platform.",
+      category: "account",
+      tags: ["buyer", "verification", "account"]
     },
     {
       question: "What is UNILAG Yard?",
@@ -57,69 +64,81 @@ const FAQPage = () => {
     },
     {
       question: "Is UNILAG Yard free to use?",
-      answer: "Yes! UNILAG Yard is completely free for all UNILAG students. There are no listing fees, commission fees, or subscription charges. We believe in providing a free service to help students save money and connect within our campus community.",
+      answer: "For buyers: Yes, completely free! Browse and message sellers without any charges. For sellers: There's a small listing fee to post products (see pricing on the Add Product page). No commission fees on sales.",
       category: "general",
-      tags: ["pricing", "free"]
+      tags: ["pricing", "free", "fees"]
     },
     {
       question: "What safety measures are in place?",
-      answer: "We prioritize safety with multiple features: student verification (in development), public campus meet-up locations only, in-app messaging system, user reporting, and clear safety guidelines. We're continuously working to enhance our safety protocols.",
+      answer: "We prioritize safety with: student verification for all sellers, requirement to meet in public campus locations only, in-app messaging system, user reporting features, and comprehensive safety guidelines. Always meet in open, public areas on campus and inspect items before payment.",
       category: "safety",
-      tags: ["safety", "meetup"]
+      tags: ["safety", "meetup", "verification"]
     },
     {
       question: "How do I report a suspicious user or listing?",
-      answer: "Click the 'Report' button on any user profile or product listing. You can also block users from messaging you. All reports are reviewed promptly, and we take appropriate action to maintain platform safety.",
+      answer: "Click the 'Report' button on any user profile or product listing. All reports are reviewed promptly, and we take appropriate action to maintain platform safety. For urgent issues, contact campus security using the emergency numbers on our Safety Tips page.",
       category: "safety",
-      tags: ["report", "safety"]
+      tags: ["report", "safety", "emergency"]
     },
     {
       question: "What payment methods are accepted?",
-      answer: "We strongly recommend cash transactions for safety reasons. Meet in person in public campus locations, inspect the item thoroughly, and pay with cash. Avoid online payments unless you have established trust with the other party.",
+      answer: "For buyer-seller transactions: We strongly recommend CASH ONLY for safety. Meet in person in public campus locations, inspect the item thoroughly, and pay with cash after verifying the product. Never pay before seeing or receiving the product. For seller listing fees: Digital payments are accepted through our secure payment system.",
       category: "transactions",
-      tags: ["payment", "cash", "safety"]
+      tags: ["payment", "cash", "safety", "fees"]
     },
     {
       question: "Can I sell digital products or services?",
-      answer: "Yes! You can sell digital products like lecture notes, software, e-books, or services like tutoring, typing, graphic design, and programming. All offerings must comply with university policies and academic integrity standards.",
+      answer: "Yes! You can sell digital products like lecture notes, software, e-books, or services like tutoring, typing, graphic design, and programming. All offerings must comply with university policies and academic integrity standards. Remember to pay the required listing fee for any product or service you post.",
       category: "general",
-      tags: ["digital", "services"]
+      tags: ["digital", "services", "listing"]
     },
     {
       question: "How long do listings stay active?",
-      answer: "Listings remain active for 30 days automatically. You can manually renew them for another 30 days if the item hasn't sold. This helps keep the marketplace fresh and relevant for all users.",
+      answer: "Product listings remain active for 30 days automatically. You can manually renew them for another 30 days if the item hasn't sold. This helps keep the marketplace fresh and relevant for all users.",
       category: "general",
-      tags: ["listings", "duration"]
+      tags: ["listings", "duration", "renewal"]
     },
     {
       question: "What should I do if a transaction goes wrong?",
-      answer: "Immediately report the issue through our platform's reporting system. Take photos as evidence if possible, and contact campus security (09090678743) if you feel unsafe. We maintain records of all platform communications to assist in dispute resolution.",
+      answer: "1) Immediately report the issue through our platform's reporting system 2) Take photos as evidence if possible 3) Contact campus security using the emergency numbers on our Safety Tips page if you feel unsafe 4) For platform-related issues, contact our support via WhatsApp or email through the Contact page",
       category: "safety",
-      tags: ["dispute", "emergency"]
+      tags: ["dispute", "emergency", "support"]
     },
     {
       question: "How do I delete my account?",
-      answer: "Go to Profile > Settings > Delete Account. Please note that this action is permanent and will remove all your listings, messages, and data from our platform. Consider deactivating instead if you might return.",
+      answer: "Go to your Profile > Settings > Delete Account. This action is permanent and will remove all your listings, messages, and data from our platform. If you have active listings, make sure to remove them first or inform your potential buyers.",
       category: "account",
-      tags: ["account", "delete"]
+      tags: ["account", "delete", "settings"]
     },
     {
       question: "Are there prohibited items I cannot sell?",
-      answer: "Yes. Prohibited items include: weapons, drugs, alcohol, stolen property, explicit content, counterfeit goods, and any items violating university policies or Nigerian laws. We reserve the right to remove any listing that violates our terms.",
+      answer: "Yes. Prohibited items include: weapons, drugs, alcohol, stolen property, explicit content, counterfeit goods, and any items violating university policies or Nigerian laws. We reserve the right to remove any listing that violates our terms of service.",
       category: "general",
-      tags: ["prohibited", "rules"]
+      tags: ["prohibited", "rules", "guidelines"]
     },
     {
       question: "Who can use UNILAG Yard?",
-      answer: "UNILAG Yard is exclusively for current University of Lagos students with valid student credentials. Both undergraduate and postgraduate students are welcome. Staff and alumni may be considered for future expansion.",
+      answer: "UNILAG Yard is exclusively for current University of Lagos students. Both undergraduate and postgraduate students can join as buyers. To become a seller, you must complete the student verification process using your official UNILAG student email.",
       category: "account",
-      tags: ["eligibility", "students"]
+      tags: ["eligibility", "students", "verification"]
     },
     {
       question: "What makes UNILAG Yard different from other marketplaces?",
-      answer: "UNILAG Yard is specifically designed for the UNILAG community with campus-focused safety features, student verification, and understanding of campus dynamics. We're built by students for students, ensuring relevance to campus life and needs.",
+      answer: "UNILAG Yard is specifically designed for the UNILAG community with campus-focused safety features, student verification for sellers, and understanding of campus dynamics. We're built to serve UNILAG students specifically, ensuring relevance to campus life and needs.",
       category: "general",
-      tags: ["unique", "campus"]
+      tags: ["unique", "campus", "community"]
+    },
+    {
+      question: "How do I get help if I have problems with the platform?",
+      answer: "For any platform issues or questions: 1) Use our WhatsApp support: +2348066562051 2) Email us at support@unilagyard.com 3) Visit our Contact page for more options. We're here to help with any technical issues or platform-related questions.",
+      category: "support",
+      tags: ["help", "support", "contact", "whatsapp"]
+    },
+    {
+      question: "Does UNILAG Yard handle the products or money between buyers and sellers?",
+      answer: "No, UNILAG Yard only facilitates the connection between buyers and sellers. We do not handle products, money, or mediate transactions. Our role is to provide a safe platform for UNILAG students to connect. All transactions are directly between buyers and sellers, and we strongly recommend cash payments upon product inspection.",
+      category: "transactions",
+      tags: ["transactions", "money", "products", "safety"]
     }
   ];
 
@@ -157,9 +176,26 @@ const FAQPage = () => {
     }
   };
 
+  // Helper function to get tag color
+  const getTagColor = (tag) => {
+    const colorMap = {
+      'important': { bg: '#ffebee', color: '#d32f2f' },
+      'verification': { bg: '#e3f2fd', color: '#1565c0' },
+      'seller': { bg: '#e8f5e9', color: '#2e7d32' },
+      'buyer': { bg: '#fff3e0', color: '#ef6c00' },
+      'safety': { bg: '#fff8e1', color: '#ff8f00' },
+      'emergency': { bg: '#ffebee', color: '#c62828' },
+      'support': { bg: '#e3f2fd', color: '#1565c0' },
+      'whatsapp': { bg: '#e8f5e9', color: '#2e7d32' },
+      'default': { bg: '#f5f5f5', color: '#666666' }
+    };
+    
+    return colorMap[tag] || colorMap.default;
+  };
+
   return (
-    <Box bg={bgColor} minH="100vh" py={12} mt={8}> {/* Added margin top to bring it down */}
-      <Container maxW="4xl">
+    <Box bg={bgColor} minH="100vh" py={12} mt={8}>
+      <Container maxW="4xl" paddingTop="30px">
         {/* About UNILAG Yard Section */}
         <MotionBox
           initial={{ opacity: 0, y: 30 }}
@@ -187,9 +223,10 @@ const FAQPage = () => {
               the platform is designed to serve and grow with the entire UNILAG community.
             </Text>
             <HStack spacing={4} mt={2}>
-              <Tag bg="#2e7d32" color="white" size="lg">Verified Students Only</Tag>
+              <Tag bg="#2e7d32" color="white" size="lg">Verified Students</Tag>
               <Tag bg="#2e7d32" color="white" size="lg">Campus-Focused</Tag>
-              <Tag bg="#2e7d32" color="white" size="lg">100% Free</Tag>
+              <Tag bg="#2e7d32" color="white" size="lg">Free for Buyers</Tag>
+              <Tag bg="#2e7d32" color="white" size="lg">Secure Platform</Tag>
             </HStack>
           </VStack>
         </MotionBox>
@@ -288,17 +325,20 @@ const FAQPage = () => {
                           {faq.question}
                         </Text>
                         <HStack spacing={2} mt={1}>
-                          {faq.tags.map((tag, tagIndex) => (
-                            <Tag 
-                              key={tagIndex} 
-                              size="sm" 
-                              bg={tag === 'important' ? '#ffebee' : '#e8f5e9'} 
-                              color={tag === 'important' ? '#d32f2f' : '#388e3c'} 
-                              variant="subtle"
-                            >
-                              {tag}
-                            </Tag>
-                          ))}
+                          {faq.tags.map((tag, tagIndex) => {
+                            const tagColor = getTagColor(tag);
+                            return (
+                              <Tag 
+                                key={tagIndex} 
+                                size="sm" 
+                                bg={tagColor.bg} 
+                                color={tagColor.color} 
+                                variant="subtle"
+                              >
+                                {tag}
+                              </Tag>
+                            );
+                          })}
                         </HStack>
                       </Box>
                       <AccordionIcon color="#388e3c" />

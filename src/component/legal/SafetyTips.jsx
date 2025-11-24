@@ -81,9 +81,9 @@ const SafetyTips = () => {
       description: 'Always choose well-lit, populated areas on campus for meet-ups.',
       tips: [
         'Library steps or entrance',
-        'Faculty building lobbies',
-        'Student Union building',
-        'Designated campus squares'
+        'Faculty/departmental quadrangle or entrance',
+        'Moremi garden',
+        'New Hall cab drop-point'
       ],
       priority: 'high'
     },
@@ -152,20 +152,26 @@ const SafetyTips = () => {
   // Updated with real UNILAG emergency contacts
   const emergencyContacts = [
     { 
-      name: 'UNILAG Security Control Room', 
-      number: '09090678743', 
+      name: 'UNILAG Chief Security Officer', 
+      number: '08027516446', 
+      description: '24/7 Emergency Line',
+      type: 'phone'
+    },
+    {
+      name: 'Unilag Main Gate Security office',
+      number: '08053366468',
       description: '24/7 Emergency Line',
       type: 'phone'
     },
     { 
       name: 'UNILAG Health Services', 
-      number: '08023256387', 
+      number: '08093933356, 08156857433', 
       description: 'Medical Emergencies',
       type: 'phone'
     },
     { 
       name: 'Student Affairs Division', 
-      number: '+234 903 000 2000', 
+      number: '09166663333', 
       description: 'Office Hours: 8AM - 4PM',
       type: 'phone'
     },
@@ -185,7 +191,7 @@ const SafetyTips = () => {
 
   return (
     <Box bg={bgColor} minH="100vh" py={12} mt={8}> {/* Added margin top to bring it down */}
-      <Container maxW="6xl">
+      <Container maxW="6xl" paddingTop="35px">
         {/* Main Header */}
         <MotionBox
           ref={mainRef}
