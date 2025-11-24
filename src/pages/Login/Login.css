@@ -717,3 +717,35 @@
   display: block;
   margin-bottom: 5px;
 }
+
+
+/* Auth Pages Dark Mode */
+.auth-background-elements .floating-shape {
+  background: var(--accent-light);
+  opacity: 0.1;
+}
+
+.security-badge {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.google-btn {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.google-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+.auth-link {
+  color: var(--accent-color);
+}
+
+.auth-link:hover {
+  color: var(--accent-hover);
+}
