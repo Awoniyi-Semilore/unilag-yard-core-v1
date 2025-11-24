@@ -11,31 +11,42 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
-  });
+  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+    setMounted(true);
+    const savedTheme = localStorage.getItem('unilag-yard-theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // Apply theme to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  }, [isDarkMode]);
+    const initialTheme = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+    setIsDark(initialTheme);
+    applyTheme(initialTheme);
+  }, []);
+
+  const applyTheme = (dark) => {
+    const theme = dark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('unilag-yard-theme', theme);
+  };
 
   const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    applyTheme(newTheme);
+  };
+
+  const setTheme = (theme) => {
+    const isDarkTheme = theme === 'dark';
+    setIsDark(isDarkTheme);
+    applyTheme(isDarkTheme);
   };
 
   const value = {
-    isDarkMode,
+    isDark,
     toggleTheme,
+    setTheme,
+    mounted
   };
 
   return (
