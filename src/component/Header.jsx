@@ -2,16 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
 import "./CSS/Header.css";
-import { 
-  Heart, 
-  MessageCircle, 
-  Bell, 
-  User, 
-  Search, 
-  PlusCircle, 
-  Moon, 
-  Sun 
-} from "lucide-react";
+import { Heart, MessageCircle, ClipboardList, Bell, User, Search, PlusCircle } from "lucide-react";
 
 const Header = ({ user = null, logout = () => {} }) => {
   const [isHovered, setIsHovered] = useState(null);
@@ -22,7 +13,6 @@ const Header = ({ user = null, logout = () => {} }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownSearchQuery, setDropdownSearchQuery] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -38,7 +28,6 @@ const Header = ({ user = null, logout = () => {} }) => {
     };
   }, []);
 
-  
   const handleIconClick = (index, id, path) => {
     if (activeIcon === index) {
       setActiveIcon(null);
@@ -57,7 +46,7 @@ const Header = ({ user = null, logout = () => {} }) => {
       label: "Saved Items", 
       id: "saved", 
       className: "heart-icon",
-      path: "/saved"
+      path: "/saved-products"
     },
     { 
       icon: MessageCircle, 
@@ -66,6 +55,13 @@ const Header = ({ user = null, logout = () => {} }) => {
       className: "message-icon",
       path: "/messages"
     },
+    // { 
+    //   icon: ClipboardList, 
+    //   label: "My Adverts", 
+    //   id: "my-advert", 
+    //   className: "advert-icon",
+    //   path: "/my-adverts"
+    // },
     { 
       icon: Bell, 
       label: "Notifications", 
@@ -78,7 +74,7 @@ const Header = ({ user = null, logout = () => {} }) => {
       label: "My Profile", 
       id: "my-profile", 
       className: "profile-icon",
-      path: "/profile"
+      path: "/my-profile"
     }
   ];
 
@@ -99,7 +95,7 @@ const Header = ({ user = null, logout = () => {} }) => {
     setIsDropdownOpen(false);
   };
 
-  // Handle search submission
+  // Handle search submission - SEPARATED from form
   const handleSearch = (query, isDropdown = false) => {
     if (query.trim()) {
       navigate(`/allProduct?search=${encodeURIComponent(query)}`);
@@ -162,7 +158,7 @@ const Header = ({ user = null, logout = () => {} }) => {
         </motion.div>
       </div>
 
-      {/* Search Section */}
+      {/* Fixed Search Section - NO FORM */}
       <div className="search-section">
         <div className="search-bar">
           <input 
@@ -172,7 +168,6 @@ const Header = ({ user = null, logout = () => {} }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => handleKeyPress(e, false)}
-            className="search-input"
           />
           <motion.button 
             className="search-icon-button"
@@ -180,7 +175,6 @@ const Header = ({ user = null, logout = () => {} }) => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             type="button"
-            aria-label="Search"
           >
             <Search size={20} className="search-icon" />
           </motion.button>
@@ -188,198 +182,5 @@ const Header = ({ user = null, logout = () => {} }) => {
       </div>
 
       <div className="nav-icons">
-        
-            {(isHovered === 'theme') && (
-              <motion.div 
-                className="icon-label"
-                variants={iconLabelVariants}
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                transition={{ duration: 0.2 }}
-              >
-                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
         {/* Map through other icons */}
-        {iconData.map((item, index) => {
-          const IconComponent = item.icon;
-          return (
-            <motion.div 
-              key={item.id} 
-              className="icon-container"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <div 
-                className="icon-clickable"
-                onClick={() => handleIconClick(index, item.id, item.path)}
-                onMouseEnter={() => handleHovered(index)}
-                onMouseLeave={handleNotHovered}
-              >
-                <IconComponent
-                  size={24} 
-                  className={`icon-hover ${item.className}`}
-                />
-              </div>
-              <AnimatePresence>
-                {(isHovered === index || activeIcon === index) && (
-                  <motion.div 
-                    className="icon-label"
-                    variants={iconLabelVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="hidden"
-                    transition={{ duration: 0.2 }}
-                  >
-                    {item.label}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
-
-        <motion.button 
-          className='product-btn'
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Link to="/addProduct" className='product-btn-link'>
-            <PlusCircle size={20} className="btn-icon" />
-            <span>Add Product</span>
-          </Link>
-        </motion.button>
-      </div>
-
-      {/* Burger Menu */}
-      <div className="burger-menu1" ref={dropdownRef}>
-        <motion.button 
-          className="burger-button"
-          onClick={toggleDropdown}
-          aria-label="Toggle menu"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          type="button"
-        >
-          <span className="burger-icon">☰</span>
-        </motion.button>
-
-        {/* Dropdown Content */}
-        <AnimatePresence>
-          {isDropdownOpen && (
-            <motion.div 
-              className="burger-dropdown"
-              variants={dropdownVariants}
-              initial="closed"
-              animate="open"
-              exit="closed"
-            >
-              <div className='burger-top'>
-                <div className="dropdown-search">
-                  <div className="dropdown-search-bar">
-                    <input 
-                      type="text" 
-                      placeholder="Search..." 
-                      aria-label="Search products"
-                      value={dropdownSearchQuery}
-                      onChange={(e) => setDropdownSearchQuery(e.target.value)}
-                      onKeyPress={(e) => handleKeyPress(e, true)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="search-input"
-                    />
-                    <motion.button 
-                      className="search-icon-button"
-                      onClick={() => handleSearch(dropdownSearchQuery, true)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      type="button"
-                      aria-label="Search"
-                    >
-                      <Search size={18} className="search-icon" />
-                    </motion.button>
-                  </div>
-                </div>
-
-                {/* Dark Mode Toggle in Dropdown */}
-                <motion.button 
-                  className="theme-toggle-dropdown"
-                  onClick={toggleDarkMode}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                >
-                  {isDarkMode ? (
-                    <Sun size={20} className="theme-icon" />
-                  ) : (
-                    <Moon size={20} className="theme-icon" />
-                  )}
-                </motion.button>
-
-                <motion.button 
-                  className='cancel' 
-                  onClick={handleCloseDropdown} 
-                  aria-label="Close menu"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  type="button"
-                >
-                  ×
-                </motion.button>
-              </div>
-              
-              <div className='nav-container' onClick={(e) => e.stopPropagation()}>
-                <div className="nav-iconss">
-                  {iconData.map((item, index) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <div key={item.id} className="icon-container">
-                        <div 
-                          className="icon-clickable"
-                          onClick={() => {
-                            handleIconClick(index, item.id, item.path);
-                            setIsDropdownOpen(false);
-                          }}
-                        >
-                          <IconComponent
-                            size={24} 
-                            className={`icon-hover ${item.className}`}
-                          />
-                        </div>
-                        <span className="dropdown-icon-label">{item.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <motion.button 
-                  className='product-btn1'
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Link 
-                    to="/addProduct" 
-                    className='product-btn1-link' 
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <PlusCircle size={20} className="btn-icon" />
-                    <span>Add Product</span>
-                  </Link>
-                </motion.button>
-              </div>  
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.header>
-  )
-}
-
-Header.defaultProps = {
-  user: null,
-  logout: () => {}
-};
-
-export default Header;
+     
