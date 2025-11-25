@@ -2,7 +2,16 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
 import "./CSS/Header.css";
-import { Heart, MessageCircle, ClipboardList, Bell, User, Search, PlusCircle } from "lucide-react";
+import { 
+  Heart, 
+  MessageCircle, 
+  Bell, 
+  User, 
+  Search, 
+  PlusCircle, 
+  Moon, 
+  Sun 
+} from "lucide-react";
 
 const Header = ({ user = null, logout = () => {} }) => {
   const [isHovered, setIsHovered] = useState(null);
@@ -13,6 +22,7 @@ const Header = ({ user = null, logout = () => {} }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownSearchQuery, setDropdownSearchQuery] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -27,6 +37,33 @@ const Header = ({ user = null, logout = () => {} }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Dark mode functionality
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('unilag-yard-theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    const initialTheme = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+    setIsDarkMode(initialTheme);
+    applyTheme(initialTheme);
+  }, []);
+
+  const applyTheme = (dark) => {
+    const theme = dark ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('unilag-yard-theme', theme);
+  };
+
+  const toggleDarkMode = () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    applyTheme(newTheme);
+    
+    // Haptic feedback on mobile
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+  };
 
   const handleIconClick = (index, id, path) => {
     if (activeIcon === index) {
@@ -46,7 +83,7 @@ const Header = ({ user = null, logout = () => {} }) => {
       label: "Saved Items", 
       id: "saved", 
       className: "heart-icon",
-      path: "/saved-products"
+      path: "/saved"
     },
     { 
       icon: MessageCircle, 
@@ -55,13 +92,6 @@ const Header = ({ user = null, logout = () => {} }) => {
       className: "message-icon",
       path: "/messages"
     },
-    // { 
-    //   icon: ClipboardList, 
-    //   label: "My Adverts", 
-    //   id: "my-advert", 
-    //   className: "advert-icon",
-    //   path: "/my-adverts"
-    // },
     { 
       icon: Bell, 
       label: "Notifications", 
@@ -74,14 +104,14 @@ const Header = ({ user = null, logout = () => {} }) => {
       label: "My Profile", 
       id: "my-profile", 
       className: "profile-icon",
-      path: "/my-profile"
+      path: "/profile"
     }
   ];
 
   const handleHovered = (index) => {
     setIsHovered(index);
   };
-  
+
   const handleNotHovered = () => {
     setIsHovered(null);
   };
@@ -95,7 +125,7 @@ const Header = ({ user = null, logout = () => {} }) => {
     setIsDropdownOpen(false);
   };
 
-  // Handle search submission - SEPARATED from form
+  // Handle search submission
   const handleSearch = (query, isDropdown = false) => {
     if (query.trim()) {
       navigate(`/allProduct?search=${encodeURIComponent(query)}`);
@@ -157,8 +187,8 @@ const Header = ({ user = null, logout = () => {} }) => {
           </Link>
         </motion.div>
       </div>
-      
-      {/* Fixed Search Section - NO FORM */}
+
+      {/* Search Section */}
       <div className="search-section">
         <div className="search-bar">
           <input 
@@ -168,6 +198,7 @@ const Header = ({ user = null, logout = () => {} }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => handleKeyPress(e, false)}
+            className="search-input"
           />
           <motion.button 
             className="search-icon-button"
@@ -175,13 +206,49 @@ const Header = ({ user = null, logout = () => {} }) => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             type="button"
+            aria-label="Search"
           >
             <Search size={20} className="search-icon" />
           </motion.button>
         </div>
       </div>
-      
+
       <div className="nav-icons">
+        {/* Dark Mode Toggle */}
+        <motion.div 
+          className="icon-container theme-toggle-container"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <div 
+            className="icon-clickable theme-toggle-btn"
+            onClick={toggleDarkMode}
+            onMouseEnter={() => handleHovered('theme')}
+            onMouseLeave={handleNotHovered}
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDarkMode ? (
+              <Sun size={24} className="icon-hover theme-icon" />
+            ) : (
+              <Moon size={24} className="icon-hover theme-icon" />
+            )}
+          </div>
+          <AnimatePresence>
+            {(isHovered === 'theme') && (
+              <motion.div 
+                className="icon-label"
+                variants={iconLabelVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                transition={{ duration: 0.2 }}
+              >
+                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
         {/* Map through other icons */}
         {iconData.map((item, index) => {
           const IconComponent = item.icon;
@@ -220,7 +287,7 @@ const Header = ({ user = null, logout = () => {} }) => {
             </motion.div>
           );
         })}
-        
+
         <motion.button 
           className='product-btn'
           whileHover={{ scale: 1.05 }}
@@ -245,7 +312,7 @@ const Header = ({ user = null, logout = () => {} }) => {
         >
           <span className="burger-icon">☰</span>
         </motion.button>
-        
+
         {/* Dropdown Content */}
         <AnimatePresence>
           {isDropdownOpen && (
@@ -267,6 +334,7 @@ const Header = ({ user = null, logout = () => {} }) => {
                       onChange={(e) => setDropdownSearchQuery(e.target.value)}
                       onKeyPress={(e) => handleKeyPress(e, true)}
                       onClick={(e) => e.stopPropagation()}
+                      className="search-input"
                     />
                     <motion.button 
                       className="search-icon-button"
@@ -274,11 +342,27 @@ const Header = ({ user = null, logout = () => {} }) => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       type="button"
+                      aria-label="Search"
                     >
                       <Search size={18} className="search-icon" />
                     </motion.button>
                   </div>
                 </div>
+
+                {/* Dark Mode Toggle in Dropdown */}
+                <motion.button 
+                  className="theme-toggle-dropdown"
+                  onClick={toggleDarkMode}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                  {isDarkMode ? (
+                    <Sun size={20} className="theme-icon" />
+                  ) : (
+                    <Moon size={20} className="theme-icon" />
+                  )}
+                </motion.button>
 
                 <motion.button 
                   className='cancel' 
@@ -291,6 +375,7 @@ const Header = ({ user = null, logout = () => {} }) => {
                   ×
                 </motion.button>
               </div>
+              
               <div className='nav-container' onClick={(e) => e.stopPropagation()}>
                 <div className="nav-iconss">
                   {iconData.map((item, index) => {
@@ -343,260 +428,3 @@ Header.defaultProps = {
 };
 
 export default Header;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useState } from 'react'
-// import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
-// import "./CSS/Header.css";
-// import { Heart, MessageCircle, ClipboardList, Bell, User, Search, PlusCircle } from "lucide-react";
-//   // In your Header component, add:
-// import { useTheme } from '../context/ThemeContext';
-// import { Moon, Sun } from 'lucide-react';
-
-// const Header = ({ user = null, logout = () => {} }) => {
-//   const [isHovered, setIsHovered] = useState(null);
-//   const [activeIcon, setActiveIcon] = useState(null);
-//   const navigate = useNavigate(); // Added for navigation
-
-//   const handleIconClick = (index, id) => {
-//     // If clicking the same icon again, close it
-//     if (activeIcon === index) {
-//       setActiveIcon(null);
-//     } else {
-//       setActiveIcon(index);
-//     }
-
-//     // Handle navigation for specific icons
-//     if (id === 'saved') {
-//       navigate('/saved-products');
-//     }
-//     // Add navigation for other icons as needed
-//     // if (id === 'messages') {
-//     //   navigate('/messages');
-//     // }
-//     // if (id === 'my-advert') {
-//     //   navigate('/my-adverts');
-//     // }
-//   };
-
-//   const iconData = [
-//     { 
-//       icon: Heart, 
-//       label: "Saved Items", 
-//       id: "saved", 
-//       className: "heart-icon",
-//       path: "/saved-products" // Added path for navigation
-//     },
-//     { 
-//       icon: MessageCircle, 
-//       label: "Messages", 
-//       id: "messages", 
-//       className: "message-icon",
-//       path: "/messages" // You can add paths for other icons too
-//     },
-//     { 
-//       icon: ClipboardList, 
-//       label: "My Adverts", 
-//       id: "my-advert", 
-//       className: "advert-icon",
-//       path: "/my-adverts"
-//     },
-//     { 
-//       icon: Bell, 
-//       label: "Notifications", 
-//       id: "notification", 
-//       className: "bell-icon",
-//       path: "/notifications"
-//     },
-//     { 
-//       icon: User, 
-//       label: "My Profile", 
-//       id: "my-profile", 
-//       className: "profile-icon",
-//       path: "/profile"
-//     }
-//   ];
-
-
-
-// // Inside your Header component:
-// const { isDarkMode, toggleTheme } = useTheme();
-//   const handleHovered = (index) => {
-//     setIsHovered(index);
-//   };
-//   const handleNotHovered = () => {
-//     setIsHovered(null);
-//   };
-
-//   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-//   const handleMouseEnter = () => {
-//     setIsDropdownOpen(true);
-//   };
-
-//   const handleMouseLeave = () => {
-//     setIsDropdownOpen(false);
-//   };
-
-//   const handleCloseDropdown = () => {
-//     setIsDropdownOpen(false);
-//   };
-
-//   // Function to handle icon click in dropdown
-//   const handleDropdownIconClick = (index, id, path) => {
-//     setActiveIcon(index);
-//     if (path) {
-//       navigate(path);
-//       setIsDropdownOpen(false); // Close dropdown after navigation
-//     }
-//   };
-
-//   return (
-//     <header className='header-d'>
-//         <div className="logo-section">
-//           <Link to="/home" className='logo'>
-//             <span className='logo-text1'>Unilag</span> Yard
-//           </Link>
-//         </div>
-        
-//         <div className="search-section">
-//           <form className="search-bar" role="search">
-//             <input 
-//               type="text" 
-//               placeholder="Search for books, gadgets, items..." 
-//               aria-label="Search products"
-//             />
-//             <Search size={20} className="search-icon" />
-//           </form>
-//         </div>
-        
-//         <div className="nav-icons">
-//           {/* Map through iconData array */}
-//           {iconData.map((item, index) => {
-//             const IconComponent = item.icon;
-//             return (
-//               <div key={item.id} className="icon-container">
-//                 {/* Make the icon clickable */}
-//                 <div 
-//                   className="icon-clickable"
-//                   onClick={() => handleIconClick(index, item.id)}
-//                 >
-//                   <IconComponent
-//                     size={24} 
-//                     className={`icon-hover ${item.className}`}
-//                     onMouseEnter={() => handleHovered(index)}
-//                     onMouseLeave={handleNotHovered}
-//                   />
-//                 </div>
-//                 {/* Show label for hovered OR clicked icon */}
-//                 {(isHovered === index || activeIcon === index) && (
-//                   <div className="icon-label">
-//                     {item.label}
-//                   </div>
-//                 )}
-//               </div>
-//             );
-//           })}
-//           // Add to your icons or navigation:
-// <IconButton
-//   aria-label="Toggle theme"
-//   icon={isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-//   onClick={toggleTheme}
-//   variant="ghost"
-//   color={isDarkMode ? "yellow.400" : "gray.600"}
-// />
-          
-//           <button className='product-btn'>
-//             <Link to="/addProduct" className='product-btn'>
-//               <PlusCircle size={20} className="btn-icon" />
-//               <span>Add Product</span>
-//             </Link>
-//           </button>
-//         </div>
-
-//         {/* Burger Menu */}
-//         <div 
-//           className="burger-menu1" 
-//           onMouseEnter={handleMouseEnter}
-//           onClick={(e) => {e.stopPropagation(); setIsDropdownOpen(!isDropdownOpen);}}
-//           onMouseLeave={handleMouseLeave}
-//         >
-//           <span className="burger-icon">☰</span>
-          
-//           {/* Dropdown Content */}
-//           {isDropdownOpen && (
-//             <div className="burger-dropdown">
-//               <div className='burger-top'>
-//                 <div className="dropdown-search">
-//                   <form className="dropdown-search-bar" role="search">
-//                     <input 
-//                       type="text" 
-//                       placeholder="Search..." 
-//                       aria-label="Search products"
-//                     />
-//                     <Search size={18} className="search-icon" />
-//                   </form>
-//                 </div>
-
-//                 <div className='cancel' onClick={handleCloseDropdown}>x</div>
-//               </div>
-//               <div className='nav-container'>
-//                 <div className="nav-iconss">
-//                   {/* Map through iconData array for dropdown */}
-//                   {iconData.map((item, index) => {
-//                     const IconComponent = item.icon;
-//                     return (
-//                       <div key={item.id} className="icon-container">
-//                         {/* Make dropdown icons clickable with navigation */}
-//                         <div 
-//                           className="icon-clickable"
-//                           onClick={() => handleDropdownIconClick(index, item.id, item.path)}
-//                         >
-//                           <IconComponent
-//                             size={24} 
-//                             className={`icon-hover ${item.className}`}
-//                             onMouseEnter={() => handleHovered(index)}
-//                             onMouseLeave={handleNotHovered}
-//                           />
-//                         </div>
-//                         {activeIcon === index && (
-//                           <div className="icon-label">
-//                             {item.label}
-//                           </div>
-//                         )}
-//                       </div>
-//                     );
-//                   })}
-//                 </div>
-//                 <button className='product-btn1'>
-//                   <Link to="/addProduct" className='product-btn1' onClick={() => setIsDropdownOpen(false)}>
-//                     <PlusCircle size={20} className="btn-icon" />
-//                     <span>Add Product</span>
-//                   </Link>
-//                 </button>
-//               </div>  
-//             </div>
-//           )}
-//         </div>
-//     </header>
-//   )
-// }
-
-// Header.defaultProps = {
-//   user: null,
-//   logout: () => {}
-// };
-
-// export default Header;
